@@ -5,12 +5,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ),
-  );
   runApp(const NexCardApp());
 }
 
@@ -27,7 +21,6 @@ class NexCardApp extends StatelessWidget {
           seedColor: const Color(0xFF0099aa),
           brightness: Brightness.dark,
         ),
-        useMaterial3: true,
       ),
       home: const SplashScreen(),
     );
@@ -35,6 +28,137 @@ class NexCardApp extends StatelessWidget {
 }
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AppWebView()),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF060608),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0047cc), Color(0xFF0099aa)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0099aa).withOpacity(0.5),
+                    blurRadius: 30,
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  'N',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 50,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'NEXCARD',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 6,
+              ),
+            ),
+            const SizedBox(height: 40),
+            const SizedBox(
+              width: 160,
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.white12,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0099aa)),
+                minHeight: 4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AppWebView extends StatefulWidget {
+  const AppWebView({super.key});
+
+  @override
+  State<AppWebView> createState() => _AppWebViewState();
+}
+
+class _AppWebViewState extends State<AppWebView> {
+  late final WebViewController _controller;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initWebView();
+  }
+
+  Future<void> _initWebView() async {
+    final String html = await rootBundle.loadString('assets/index.html');
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0xFF0d0d1a))
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageFinished: (_) => setState(() => _isLoading = false),
+      ))
+      ..loadHtmlString(html);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0d0d1a),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            WebViewWidget(controller: _controller),
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF0099aa),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
