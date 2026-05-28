@@ -1,63 +1,25 @@
 الاسم: تطبيق بناء NexCard
-
 على:
   يدفع:
     الفروع: [الرئيسي]
   workflow_dispatch:
-
 الوظائف:
   يبني:
     يعمل على: أوبونتو-أحدث
     خطوات:
       - يستخدم: actions/checkout@v4
-
       - يستخدم: actions/setup-java@v4
         مع:
-          التوزيع: 'زولو'
+          التوزيع: الزولو
           إصدار جافا: '17'
-
       - يستخدم: subosito/flutter-action@v2
         مع:
-          flutter-version: '3.19.6'
-          القناة: 'مستقرة'
-
+          إصدار فلاتر: 3.19.6
+          القناة: مستقرة
       - الاسم: إنشاء ملف APK
-        تشغيل: |
-          flutter create --org com.nexcard.iq --project-name nexcard /tmp/build
-          انسخ الملف lib/main.dart إلى /tmp/build/lib/main.dart
-          انسخ ملف pubspec.yaml إلى المسار /tmp/build/pubspec.yaml
-          mkdir -p /tmp/build/assets
-          cp assets/index.html /tmp/build/assets/index.html
-          cd /tmp/build
-          فلاتر باب جيت
-          flutter build apk --release --no-tree-shake-icons
-          انسخ الملف build/app/outputs/flutter-apk/app-release.apk إلى $GITHUB_WORKSPACE/NexCard.apk
-
+        تشغيل: flutter create --org com.nexcard.iq --project-name nexcard /tmp/build && cp lib/main.dart /tmp/build/lib/main.dart && cp pubspec.yaml /tmp/build/pubspec.yaml && mkdir -p /tmp/build/assets && cp assets/index.html /tmp/build/assets/index.html && cd /tmp/build && flutter pub get && flutter build apk --release --no-tree-shake-icons && cp build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/NexCard.apk
       - يستخدم: actions/upload-artifact@v4
         مع:
           الاسم: NexCard-APK
           المسار: NexCard.apk
-          أيام الاحتفاظ: 3        مع:
-          الاسم: NexCard-APK
-          المسار: NexCard.apk
-          أيام الاحتفاظ: 30          
-          # Update gradle wrapper
-          sed -i 's/distributionUrl=.*/distributionUrl=https\\:\\/\\/services.gradle.org\\/distributions\\/gradle-8.0-bin.zip/' android/gradle/wrapper/gradle-wrapper.properties
-          
-          # Update build.gradle
-          sed -i 's/compileSdkVersion .*/compileSdk 34/' android/app/build.gradle
-          sed -i 's/minSdkVersion .*/minSdk 21/' android/app/build.gradle
-          sed -i 's/targetSdkVersion .*/targetSdk 34/' android/app/build.gradle
-          
-          # Build
-          flutter pub get
-          flutter build apk --release --no-tree-shake-icons
-          
-          # Copy result
-          cp build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/NexCard.apk
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: NexCard-APK
-          path: NexCard.apk
-          retention-days: 30
+          أيام الاحتفاظ: 30
