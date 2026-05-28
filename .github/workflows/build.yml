@@ -1,4 +1,4 @@
-الاسم: تطبيق بناء NexCard
+الاسم: CI
 على:
   يدفع:
     الفروع: [الرئيسي]
@@ -11,15 +11,23 @@
       - يستخدم: actions/setup-java@v4
         مع:
           التوزيع: الزولو
-          إصدار جافا: '17'
+          إصدار جافا: 17
       - يستخدم: subosito/flutter-action@v2
         مع:
           إصدار فلاتر: 3.19.6
           القناة: مستقرة
-      - الاسم: إنشاء ملف APK
-        تشغيل: flutter create --org com.nexcard.iq --project-name nexcard /tmp/build && cp lib/main.dart /tmp/build/lib/main.dart && cp pubspec.yaml /tmp/build/pubspec.yaml && mkdir -p /tmp/build/assets && cp assets/index.html /tmp/build/assets/index.html && cd /tmp/build && flutter pub get && flutter build apk --release --no-tree-shake-icons && cp build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/NexCard.apk
+      - الاسم: بناء
+        تشغيل: |
+          flutter create --org com.nexcard.iq --project-name nexcard /tmp/n
+          انسخ الملف lib/main.dart إلى /tmp/n/lib/main.dart
+          انسخ ملف pubspec.yaml إلى المسار /tmp/n/pubspec.yaml
+          mkdir -p /tmp/n/assets
+          cp assets/index.html /tmp/n/assets/index.html
+          cd /tmp/n
+          فلاتر باب جيت
+          flutter build apk --release
+          انسخ الملف build/app/outputs/flutter-apk/app-release.apk إلى $GITHUB_WORKSPACE/app.apk
       - يستخدم: actions/upload-artifact@v4
         مع:
-          الاسم: NexCard-APK
-          المسار: NexCard.apk
-          أيام الاحتفاظ: 30
+          الاسم: تطبيق
+          المسار: app.apk
