@@ -1,33 +1,33 @@
-الاسم: CI
-على:
-  يدفع:
-    الفروع: [الرئيسي]
+name: CI
+on:
+  push:
+    branches: [main]
   workflow_dispatch:
-الوظائف:
-  يبني:
-    يعمل على: أوبونتو-أحدث
-    خطوات:
-      - يستخدم: actions/checkout@v4
-      - يستخدم: actions/setup-java@v4
-        مع:
-          التوزيع: الزولو
-          إصدار جافا: 17
-      - يستخدم: subosito/flutter-action@v2
-        مع:
-          إصدار فلاتر: 3.19.6
-          القناة: مستقرة
-      - الاسم: بناء
-        تشغيل: |
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.19.6
+          channel: stable
+      - name: build
+        run: |
           flutter create --org com.nexcard.iq --project-name nexcard /tmp/n
-          انسخ الملف lib/main.dart إلى /tmp/n/lib/main.dart
-          انسخ ملف pubspec.yaml إلى المسار /tmp/n/pubspec.yaml
+          cp lib/main.dart /tmp/n/lib/main.dart
+          cp pubspec.yaml /tmp/n/pubspec.yaml
           mkdir -p /tmp/n/assets
           cp assets/index.html /tmp/n/assets/index.html
           cd /tmp/n
-          فلاتر باب جيت
+          flutter pub get
           flutter build apk --release
-          انسخ الملف build/app/outputs/flutter-apk/app-release.apk إلى $GITHUB_WORKSPACE/app.apk
-      - يستخدم: actions/upload-artifact@v4
-        مع:
-          الاسم: تطبيق
-          المسار: app.apk
+          cp build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/app.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app.apk
