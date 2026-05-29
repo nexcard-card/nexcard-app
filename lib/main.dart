@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const App());
 }
@@ -26,25 +25,24 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  WebViewController? ctrl;
+  InAppLocalhostServer? server;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _startServer();
   }
 
-  Future<void> _load() async {
-    try {
-      final html = await rootBundle.loadString('assets/index.html');
-      final c = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(const Color(0xFF0d0d1a))
-        ..loadHtmlString(html, baseUrl: 'about:blank');
-      if (mounted) setState(() => ctrl = c);
-    } catch (e) {
-      debugPrint('Error: $e');
-    }
+  Future<void> _startServer() async {
+    server = InAppLocalhostServer(documentRoot: 'assets');
+    await server!.start();
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    server?.close();
+    super.dispose();
   }
 
   @override
@@ -52,13 +50,21 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: const Color(0xFF0d0d1a),
       body: SafeArea(
-        child: ctrl == null
+        child: server == null
             ? const Center(
                 child: CircularProgressIndicator(
                   color: Color(0xFF0099aa),
                 ),
               )
-            : WebViewWidget(controller: ctrl!),
+            : InAppWebView(
+                initialUrlRequest: URLRequest(
+                  url: WebUri('http://localhost:8080/index.html'),
+                ),
+                initialSettings: InAppWebViewSettings(
+                  javaScriptEnabled: true,
+                  mediaPlaybackRequiresUserGesture: false,
+                ),
+              ),
       ),
     );
   }
