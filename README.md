@@ -1,2 +1,0 @@
-# nexcard-app
-NexCard App
