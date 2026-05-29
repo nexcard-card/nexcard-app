@@ -22,7 +22,7 @@ jobs:
           cp lib/main.dart /tmp/n/lib/main.dart
           cp pubspec.yaml /tmp/n/pubspec.yaml
           mkdir -p /tmp/n/assets
-          cp assets/index.html /tmp/n/assets/index.html
+          cp -r assets/. /tmp/n/assets/
           cd /tmp/n
           flutter pub get
           flutter build apk --release
