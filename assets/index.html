@@ -2,249 +2,1013 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#0099aa">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NexCard">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NexCard</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body { width:100%; height:100%; overflow:hidden; font-family:"Tajawal",sans-serif; background:#000; }
-
-/* PHONE */
-.app {
-  width:100vw; height:100vh;
-  max-width:390px; max-height:844px;
-  margin:0 auto;
-  position:relative; overflow:hidden;
-  background:#f0f0f5;
-}
-
-/* SCREENS */
-.screen {
-  position:absolute; inset:0;
-  display:none; flex-direction:column;
-  overflow:hidden; background:#f0f0f5;
-}
+html, body { width:100%; height:100%; overflow:hidden; font-family:"Tajawal",sans-serif; background:#111; }
+.app { width:100%; height:100%; position:relative; overflow:hidden; background:#f5f5f5; }
+.screen { position:absolute; inset:0; display:none; flex-direction:column; overflow:hidden; background:#f5f5f5; }
 .screen.active { display:flex; }
-
-/* TRANSITION */
-.screen.slide-in { animation:slideIn 0.3s ease forwards; }
-.screen.slide-out { animation:slideOut 0.3s ease forwards; }
-@keyframes slideIn { from{transform:translateX(-100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
-@keyframes slideOut { from{transform:translateX(0);opacity:1;} to{transform:translateX(100%);opacity:0;} }
-
-/* ============ COMMON ============ */
-.notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:28px; border-radius:0 0 20px 20px; z-index:100; }
-.status-bar { position:absolute; top:10px; left:20px; right:20px; display:flex; justify-content:space-between; font-size:11px; z-index:99; }
-.top-bar { padding:38px 16px 10px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-.top-bar.white { background:#f0f0f5; }
-.header-title { font-size:17px; font-weight:900; color:#1a1a2e; }
-.back-btn { width:38px; height:38px; background:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.08); cursor:pointer; }
-.tb-logo-img { width:46px; height:46px; border-radius:50%; object-fit:cover; }
-.tb-left { display:flex; gap:10px; }
-.tb-btn { width:46px; height:46px; background:#fff; border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.08); position:relative; cursor:pointer; }
-.tb-badge { position:absolute; top:-5px; right:-5px; width:18px; height:18px; background:#0099aa; border-radius:50%; font-size:9px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; border:2px solid #f0f0f5; }
-.search-wrap { padding:10px 16px 14px; display:flex; gap:10px; align-items:center; flex-shrink:0; background:#f0f0f5; }
-.search-bar { flex:1; background:#fff; border-radius:14px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.06); cursor:pointer; }
-.sb-text { font-size:13px; color:#bbb; }
-.search-fav { width:46px; height:46px; background:#fff; border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.06); flex-shrink:0; cursor:pointer; }
 .scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .scroll::-webkit-scrollbar { display:none; }
-
-/* BOTTOM NAV */
-.bottom-nav { position:relative; background:#fff; border-top:1px solid #f0f0f0; box-shadow:0 -2px 12px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:space-around; padding:8px 6px 14px; flex-shrink:0; z-index:50; }
-.nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 10px; cursor:pointer; position:relative; }
-.nav-label { font-size:10px; color:#bbb; font-weight:700; }
-.nav-label.act { color:#0099aa; font-weight:900; }
-.nav-dot { width:5px; height:5px; border-radius:50%; background:#0099aa; position:absolute; bottom:-2px; }
-
-/* CARDS */
-.card { background:#fff; border-radius:16px; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.sec-hdr { display:flex; justify-content:space-between; align-items:center; padding:0 16px; margin-bottom:10px; margin-top:16px; }
-.sec-title { font-size:15px; font-weight:900; color:#1a1a2e; }
-.sec-more { font-size:12px; color:#0099aa; font-weight:700; cursor:pointer; }
-
-/* BUTTONS */
-.btn-primary { width:100%; padding:16px; background:#0099aa; border:none; border-radius:16px; color:#fff; font-size:16px; font-weight:900; font-family:"Tajawal",sans-serif; cursor:pointer; box-shadow:0 4px 14px rgba(0,153,170,0.3); }
-.btn-secondary { width:100%; padding:14px; background:#fff; border:1.5px solid #e0e0e0; border-radius:16px; color:#555; font-size:14px; font-weight:700; font-family:"Tajawal",sans-serif; cursor:pointer; }
-
-/* ============ SPLASH ============ */
-#splash { background:linear-gradient(160deg,#060608 0%,#0d1a35 100%); }
-#splash .notch { background:#060608; }
-#splash .status-bar { color:rgba(255,255,255,0.5); }
-.splash-content { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
-.splash-logo { width:90px; height:90px; border-radius:50%; object-fit:cover; box-shadow:0 0 40px rgba(0,153,170,0.5); border:2px solid rgba(0,153,170,0.3); }
-.splash-name { font-family:"Orbitron",monospace; font-weight:900; font-size:28px; letter-spacing:5px; color:#fff; }
-.splash-sub { font-size:12px; color:rgba(0,153,170,0.7); letter-spacing:3px; }
-.splash-loader { width:140px; height:3px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; margin-top:20px; }
-.splash-bar { height:100%; background:linear-gradient(90deg,#0099aa,#00c8c8); border-radius:10px; animation:load 2.5s ease forwards; }
-@keyframes load { 0%{width:0%;} 100%{width:100%;} }
-
-/* ============ WELCOME ============ */
-#welcome { background:#f0f0f5; align-items:center; justify-content:center; padding:40px 24px; }
-.welcome-logo { width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:20px; box-shadow:0 0 30px rgba(0,153,170,0.3); }
-.welcome-name { font-family:"Orbitron",monospace; font-weight:900; font-size:24px; letter-spacing:4px; color:#1a1a2e; margin-bottom:8px; }
-.welcome-sub { font-size:14px; color:#aaa; margin-bottom:40px; text-align:center; }
-.welcome-cards { display:flex; gap:14px; margin-bottom:40px; }
-.wcard { width:80px; height:50px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
-.wc1{background:linear-gradient(135deg,#1a0050,#6600cc);}
-.wc2{background:linear-gradient(135deg,#001a50,#0044cc);}
-.wc3{background:linear-gradient(135deg,#003300,#009900);}
-.wcard-icon { font-size:20px; }
-.wcard-txt { font-size:8px; color:rgba(255,255,255,0.8); font-weight:700; }
-
-/* ============ HOME ============ */
-.banner { margin:0 16px 6px; background:linear-gradient(135deg,#0099aa,#00c8c8); border-radius:20px; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; min-height:150px; position:relative; overflow:hidden; }
-.banner::before { content:""; position:absolute; top:-40px; left:-40px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.06); }
-.banner-txt h3 { font-size:17px; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.3; }
-.banner-txt p { font-size:12px; color:rgba(255,255,255,0.8); margin-bottom:12px; }
-.banner-cta { background:#fff; color:#0099aa; font-size:11px; font-weight:900; padding:7px 16px; border-radius:20px; display:inline-block; }
-.banner-emoji { font-size:70px; animation:float 3s ease-in-out infinite; }
+.nav { background:#fff; border-top:1px solid #eee; display:flex; align-items:center; justify-content:space-around; padding:8px 0 16px; flex-shrink:0; }
+.nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 14px; cursor:pointer; }
+.nav-lbl { font-size:10px; color:#aaa; font-weight:700; }
+.nav-lbl.on { color:#0099aa; }
+.card2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px; }
+.brand-card { border-radius:14px; overflow:hidden; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+.brand-img { height:95px; display:flex; align-items:center; justify-content:center; font-size:46px; }
+.brand-info { background:#fff; padding:9px 12px; }
+.brand-name { font-size:13px; font-weight:900; color:#1a1a2e; }
+.brand-price { font-size:11px; color:#aaa; }
+.prod-card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.07); cursor:pointer; }
+.prod-img { height:110px; display:flex; align-items:center; justify-content:center; font-size:48px; position:relative; }
+.prod-fav { position:absolute; top:8px; right:8px; width:26px; height:26px; background:rgba(255,255,255,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; }
+.prod-body { padding:10px 12px 12px; }
+.prod-brand { font-size:10px; color:#aaa; margin-bottom:2px; }
+.prod-name { font-size:12px; font-weight:900; color:#1a1a2e; margin-bottom:6px; }
+.prod-bottom { display:flex; align-items:center; justify-content:space-between; }
+.prod-price { font-size:12px; font-weight:900; color:#0099aa; }
+.add-btn { width:28px; height:28px; background:#0099aa; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; font-weight:900; cursor:pointer; }
+.btn-main { width:100%; padding:15px; background:#0099aa; border:none; border-radius:14px; color:#fff; font-size:15px; font-weight:900; font-family:"Tajawal",sans-serif; cursor:pointer; box-shadow:0 4px 14px rgba(0,153,170,0.3); }
+.btn-sec { width:100%; padding:13px; background:#fff; border:1.5px solid #e0e0e0; border-radius:14px; color:#555; font-size:14px; font-weight:700; font-family:"Tajawal",sans-serif; cursor:pointer; }
+.top-bar { padding:38px 16px 10px; display:flex; align-items:center; justify-content:space-between; background:#f5f5f5; flex-shrink:0; }
+.back-btn { width:36px; height:36px; background:#fff; border-radius:11px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.08); cursor:pointer; }
+.hdr-title { font-size:16px; font-weight:900; color:#1a1a2e; }
+.input-box { width:100%; padding:13px 14px; background:#fff; border-radius:13px; border:1.5px solid #e8e8e8; font-size:14px; font-family:"Tajawal",sans-serif; color:#1a1a2e; text-align:right; outline:none; }
+.input-box:focus { border-color:#0099aa; }
+.pay-opt { display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px; border-radius:12px; border:2px solid #e8e8e8; cursor:pointer; background:#fff; }
+.pay-opt.sel { border-color:#0099aa; background:#f0fbfb; }
+.menu-row { display:flex; align-items:center; padding:16px; border-bottom:1px solid #f5f5f5; cursor:pointer; }
+.menu-label { flex:1; font-size:14px; color:#1a1a2e; text-align:right; margin-left:12px; }
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a1a2e; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; z-index:999; opacity:0; transition:opacity 0.3s; white-space:nowrap; pointer-events:none; }
 @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
-.bdots { display:flex; gap:6px; justify-content:center; margin:8px 0 16px; }
-.bdot { width:8px; height:8px; border-radius:50%; background:#ccc; }
-.bdot.on { background:#0099aa; width:22px; border-radius:4px; }
+@keyframes spin { to{transform:rotate(360deg);} }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+</style>
+</head>
+<body>
+<div class="app">
 
-.brands-row { display:flex; gap:10px; overflow-x:auto; padding:0 16px 4px; }
-.brands-row::-webkit-scrollbar { display:none; }
-.brand-item { display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; cursor:pointer; }
-.brand-circle { width:56px; height:56px; border-radius:16px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-.brand-name { font-size:10px; color:#666; font-weight:700; }
+<!-- ===== الرئيسية ===== -->
+<div class="screen active" id="home">
+  <div style="padding:40px 16px 10px;display:flex;align-items:center;justify-content:space-between;background:#f5f5f5;flex-shrink:0;">
+    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-weight:900;color:#fff;font-size:10px;" onclick="goTo('account')">NC</div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;">NexCard</div>
+    <div style="position:relative;cursor:pointer;" onclick="goTo('notifications')">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div id="notif-badge" style="position:absolute;top:-3px;right:-3px;width:15px;height:15px;background:#0099aa;border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;">3</div>
+    </div>
+  </div>
+  <div style="padding:0 16px 12px;flex-shrink:0;">
+    <div onclick="goTo('search')" style="background:#fff;border-radius:13px;padding:11px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span style="color:#ccc;font-size:13px;flex:1;text-align:right;">ابحث عن بطاقة...</span>
+    </div>
+  </div>
+  <div class="scroll" style="padding-bottom:70px;">
+    <!-- بنر -->
+    <div style="margin:0 16px 14px;border-radius:16px;overflow:hidden;position:relative;height:150px;">
+      <div id="slider" style="display:flex;height:100%;transition:transform 0.5s ease;">
+        <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;" onclick="openBrand('PlayStation')">
+          <div><div style="font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:4px;">⚡ عروض حصرية</div><div style="font-size:16px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:8px;">اشحن الآن<br>أفضل الأسعار!</div><div style="background:#fff;color:#0099aa;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;display:inline-block;">تسوق الآن ←</div></div>
+          <div style="font-size:62px;animation:float 3s ease-in-out infinite;">🎮</div>
+        </div>
+        <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#1b2838,#2a475e);display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;" onclick="openBrand('Steam')">
+          <div><div style="font-size:10px;color:#64c8ff;margin-bottom:4px;">🔵 Steam</div><div style="font-size:16px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:8px;">بطاقات Steam<br>لجميع الألعاب!</div><div style="background:#0099aa;color:#fff;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;display:inline-block;">اشترِ الآن ←</div></div>
+          <div style="font-size:62px;animation:float 3s ease-in-out infinite;">🔵</div>
+        </div>
+        <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#107c10,#52b043);display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;" onclick="openBrand('Xbox')">
+          <div><div style="font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:4px;">🟢 Xbox</div><div style="font-size:16px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:8px;">Xbox Game Pass<br>العب بلا حدود!</div><div style="background:#fff;color:#107c10;font-size:10px;font-weight:900;padding:5px 14px;border-radius:20px;display:inline-block;">اشترِ الآن ←</div></div>
+          <div style="font-size:62px;animation:float 3s ease-in-out infinite;">🟢</div>
+        </div>
+      </div>
+      <div id="dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;">
+        <div style="width:20px;height:5px;border-radius:3px;background:#fff;transition:all 0.3s;"></div>
+        <div style="width:7px;height:5px;border-radius:3px;background:#fff;opacity:0.5;transition:all 0.3s;"></div>
+        <div style="width:7px;height:5px;border-radius:3px;background:#fff;opacity:0.5;transition:all 0.3s;"></div>
+      </div>
+    </div>
+    <!-- تصنيفات دائرية مثل دجلة -->
+    <div style="display:flex;gap:10px;padding:0 16px;margin-bottom:14px;overflow-x:auto;">
+      <div onclick="openBrand('Fortnite')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">⚡</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">Fortnite</div>
+      </div>
+      <div onclick="openBrand('Free Fire')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">🎯</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">Free Fire</div>
+      </div>
+      <div onclick="openBrand('Nintendo')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">🎲</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">Nintendo</div>
+      </div>
+      <div onclick="openBrand('Steam')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">🔵</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">Steam</div>
+      </div>
+      <div onclick="openBrand('Xbox')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">🟢</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">Xbox</div>
+      </div>
+      <div onclick="openBrand('PlayStation')" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+        <div style="width:58px;height:58px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px rgba(0,0,0,0.08);">🎮</div>
+        <div style="font-size:10px;color:#555;font-weight:700;">PlayStation</div>
+      </div>
+    </div>
+    <!-- الشركات - مثل دجلة -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px;">
+      <div onclick="openBrand('PlayStation')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#003087,#0070cc);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">🎮</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">PlayStation</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة PlayStation</div><div style="font-size:11px;color:#aaa;">من 13,000 د.ع</div></div>
+      </div>
+      <div onclick="openBrand('Xbox')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#107c10,#52b043);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">🟢</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">Xbox</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة Xbox</div><div style="font-size:11px;color:#aaa;">من 13,000 د.ع</div></div>
+      </div>
+      <div onclick="openBrand('Steam')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#1b2838,#2a475e);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">🔵</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">Steam</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة Steam</div><div style="font-size:11px;color:#aaa;">من 7,000 د.ع</div></div>
+      </div>
+      <div onclick="openBrand('Nintendo')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#e4000f,#ff6b6b);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">🎲</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">Nintendo</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة Nintendo</div><div style="font-size:11px;color:#aaa;">من 13,000 د.ع</div></div>
+      </div>
+      <div onclick="openBrand('Free Fire')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#ff6600,#ff9900);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">🎯</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">Free Fire</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة Free Fire</div><div style="font-size:11px;color:#aaa;">من 5,000 د.ع</div></div>
+      </div>
+      <div onclick="openBrand('Fortnite')" style="border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <div style="background:linear-gradient(135deg,#5865F2,#7289da);height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:44px;">⚡</div>
+          <div style="font-size:14px;font-weight:900;color:#fff;">Fortnite</div>
+        </div>
+        <div style="background:#fff;padding:8px 12px;"><div style="font-size:11px;color:#aaa;">شحن بطاقة Fortnite</div><div style="font-size:11px;color:#aaa;">من 9,000 د.ع</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="sendSupportMsg()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><div class="nav-lbl">تحدث معنا</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" stroke="#fff" fill="none" stroke-width="1.5"/></svg><div class="nav-lbl on">تسوق</div></div>
+  </div>
+</div>
 
-.products-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 16px; }
-.product-card { background:#fff; border-radius:16px; padding:14px; position:relative; box-shadow:0 2px 10px rgba(0,0,0,0.06); overflow:hidden; cursor:pointer; }
-.pc-line { position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0; }
-.pc-r{background:linear-gradient(90deg,#e60012,#ff4d6d);}
-.pc-b{background:linear-gradient(90deg,#0047cc,#00c3ff);}
-.pc-g{background:linear-gradient(90deg,#006400,#00d400);}
-.pc-p{background:linear-gradient(90deg,#6600cc,#a855f7);}
-.pc-fav { position:absolute; top:10px; left:10px; font-size:16px; }
-.pc-icon { font-size:36px; margin-bottom:8px; margin-top:6px; }
-.pc-name { font-size:13px; font-weight:900; color:#1a1a2e; margin-bottom:3px; }
-.pc-amount { font-size:11px; color:#aaa; margin-bottom:10px; }
-.pc-bottom { display:flex; align-items:center; justify-content:space-between; }
-.pc-price { font-size:13px; font-weight:900; color:#0099aa; }
-.pc-btn { width:30px; height:30px; border-radius:50%; background:#0099aa; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; font-weight:900; cursor:pointer; }
+<!-- ===== منتجات الشركة ===== -->
+<div class="screen" id="brand_products">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title" id="brand-title">المنتجات</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="background:#f0f0f5;padding:12px 12px 80px;">
+    <div id="brand-grid" class="card2"></div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">حسابي</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
 
-/* ============ CART EMPTY ============ */
-.cart-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:40px; }
-.cart-bag { width:90px; height:100px; background:#e8eaf0; border-radius:10px; position:relative; display:flex; align-items:center; justify-content:center; margin:0 auto; }
-.cart-bag::before { content:""; position:absolute; top:-20px; left:50%; transform:translateX(-50%); width:40px; height:22px; border:6px solid #e8eaf0; border-bottom:none; border-radius:20px 20px 0 0; }
-.cart-face { display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:10px; }
-.cart-eyes { display:flex; gap:10px; }
-.cart-eye { width:8px; height:8px; border-radius:50%; background:#aab0c0; }
-.cart-mouth { width:16px; height:4px; background:#aab0c0; border-radius:2px; }
-.cart-badge2 { position:absolute; top:-8px; left:-8px; width:32px; height:32px; background:#0099aa; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:900; }
-.zzz { position:absolute; top:-10px; right:-10px; display:flex; flex-direction:column; gap:2px; }
-.z-l { font-size:16px; font-weight:900; color:#0099aa; line-height:1; }
+<!-- ===== تفاصيل المنتج ===== -->
+<div class="screen" id="product_detail">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goBack()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title">تفاصيل المنتج</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="padding-bottom:90px;">
+    <div id="pd-img" style="margin:12px 16px;border-radius:18px;height:180px;background:linear-gradient(135deg,#003087,#0070cc);display:flex;align-items:center;justify-content:center;font-size:88px;">🎮</div>
+    <div style="padding:0 16px;">
+      <div id="pd-name" style="font-size:18px;font-weight:900;color:#1a1a2e;margin-bottom:6px;">PlayStation — Network 10$</div>
+      <div id="pd-price" style="font-size:22px;font-weight:900;color:#0099aa;margin-bottom:14px;">13,000 د.ع</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div style="background:#e0f5f5;border-radius:10px;padding:7px 12px;text-align:center;"><div style="font-size:16px;">✅</div><div style="font-size:9px;color:#0099aa;font-weight:700;">رسمي</div></div>
+        <div style="background:#e0f5f5;border-radius:10px;padding:7px 12px;text-align:center;"><div style="font-size:16px;">⚡</div><div style="font-size:9px;color:#0099aa;font-weight:700;">فوري</div></div>
+        <div style="background:#e0f5f5;border-radius:10px;padding:7px 12px;text-align:center;"><div style="font-size:16px;">🌍</div><div style="font-size:9px;color:#0099aa;font-weight:700;">عالمي</div></div>
+      </div>
+      <div style="background:#f0fbfb;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:14px;">
+        <div style="font-size:18px;">💬</div>
+        <div style="font-size:12px;color:#0099aa;font-weight:700;">بعد الدفع يصلك الكود على واتساب فوراً</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">📋 معلومات المنتج</div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:12px;color:#aaa;">النوع</span><span style="font-size:12px;font-weight:700;color:#1a1a2e;">بطاقة رقمية</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:12px;color:#aaa;">المنطقة</span><span style="font-size:12px;font-weight:700;color:#1a1a2e;">عالمي</span></div>
+        <div style="display:flex;justify-content:space-between;padding:7px 0;"><span style="font-size:12px;color:#aaa;">التسليم</span><span style="font-size:12px;font-weight:700;color:#0099aa;">واتساب فوري</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:12px 16px 20px;background:#f5f5f5;flex-shrink:0;display:flex;gap:10px;">
+    <button id="fav-btn" onclick="toggleFavDetail()" style="width:50px;height:50px;background:#fff;border:1.5px solid #e0e0e0;border-radius:13px;font-size:20px;cursor:pointer;flex-shrink:0;">🤍</button>
+    <button class="btn-main" onclick="addCurrentToCart()">إضافة إلى السلة 🛒</button>
+  </div>
 
-/* ============ ACCOUNT ============ */
-.menu-list { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin:0 16px; }
-.menu-item { display:flex; align-items:center; padding:18px 16px; border-bottom:1px solid #f5f5f5; cursor:pointer; }
-.menu-item:last-child { border-bottom:none; }
-.mi-arrow { color:#ccc; font-size:18px; margin-left:0; margin-right:auto; }
-.mi-label { font-size:15px; color:#1a1a2e; font-weight:500; flex:1; text-align:right; margin-left:12px; }
-.mi-toggle { width:44px; height:24px; background:#0099aa; border-radius:12px; position:relative; flex-shrink:0; }
-.mi-toggle::after { content:""; position:absolute; top:3px; right:3px; width:18px; height:18px; background:#fff; border-radius:50%; }
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">تسوق</div></div>
+  </div>
+</div>
+<div class="screen" id="cart">
+  <div class="top-bar"><div style="width:36px;"></div><div class="hdr-title">عربة التسوق 🛒</div><div style="width:36px;"></div></div>
+  <div id="cart-body" class="scroll" style="flex:1;overflow-y:auto;"></div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">حسابي</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6" stroke="#fff"/><path d="M16 10a4 4 0 01-8 0" stroke="#fff" fill="none"/></svg><div class="nav-lbl on">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
 
-/* ============ OTP ============ */
-#otp { background:#f0f0f5; }
-.otp-content { flex:1; display:flex; flex-direction:column; align-items:center; padding:0 24px; }
-.otp-icon-wrap { width:70px; height:70px; background:#e0f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
-.otp-title { font-size:22px; font-weight:900; color:#1a1a2e; margin-bottom:8px; }
-.otp-sub { font-size:13px; color:#aaa; text-align:center; margin-bottom:24px; }
-.phone-row { display:flex; gap:8px; width:100%; margin-bottom:24px; }
-.country-btn { display:flex; align-items:center; gap:5px; background:#fff; border-radius:14px; padding:13px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); cursor:pointer; flex-shrink:0; }
-.c-flag { font-size:18px; }
-.c-code { font-size:13px; font-weight:700; color:#1a1a2e; direction:ltr; }
-.phone-field { flex:1; background:#fff; border-radius:14px; padding:13px 14px; border:none; outline:none; font-size:14px; font-family:"Tajawal",sans-serif; color:#1a1a2e; text-align:right; box-shadow:0 2px 8px rgba(0,0,0,0.06); direction:ltr; }
-.phone-field::placeholder { direction:rtl; color:#ccc; }
-.otp-boxes { display:flex; gap:10px; justify-content:center; margin-bottom:16px; direction:ltr; }
-.otp-box { width:46px; height:54px; background:#fff; border-radius:14px; border:2px solid #e8e8e8; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#1a1a2e; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-.otp-box.active { border-color:#0099aa; }
-.otp-box.filled { border-color:#0099aa; background:#f0fbfb; }
-.otp-hidden { position:absolute; opacity:0; width:1px; height:1px; }
-.timer-row { display:flex; align-items:center; gap:5px; margin-bottom:24px; }
-.t-label { font-size:12px; color:#aaa; }
-.t-num { font-size:12px; font-weight:900; color:#0099aa; }
+<!-- ===== بطاقاتي ===== -->
+<div class="screen" id="tracking">
+  <div class="top-bar"><div style="width:36px;"></div><div class="hdr-title">بطاقاتي</div><div style="width:36px;"></div></div>
+  <div style="display:flex;gap:10px;padding:0 16px 12px;flex-shrink:0;">
+    <div id="tab-orders" onclick="switchTab('orders')" style="flex:1;padding:10px;background:#0099aa;color:#fff;border-radius:12px;text-align:center;font-size:13px;font-weight:900;cursor:pointer;">طلباتي</div>
+    <div id="tab-favs" onclick="switchTab('favs')" style="flex:1;padding:10px;background:#fff;color:#aaa;border-radius:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);">المفضلة</div>
+  </div>
+  <div id="panel-orders" class="scroll" style="padding:0 0 20px;"></div>
+  <div id="panel-favs" class="scroll" style="padding:0 0 20px;display:none;"></div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">حسابي</div></div>
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10" stroke="#fff"/></svg><div class="nav-lbl on">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
 
-/* ============ CHECKOUT ============ */
-#checkout { background:#f0f0f5; }
-.row-card { background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.row-right { display:flex; align-items:center; gap:12px; }
-.row-icon { width:40px; height:40px; border-radius:12px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; }
-.row-info { text-align:right; }
-.row-label { font-size:11px; color:#aaa; margin-bottom:3px; }
-.row-value { font-size:15px; font-weight:900; color:#1a1a2e; }
-.row-edit { font-size:14px; font-weight:700; color:#0099aa; cursor:pointer; }
-.add-row { background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.add-right { display:flex; align-items:center; gap:10px; }
-.add-label { font-size:14px; color:#aaa; }
-.add-plus { width:30px; height:30px; border-radius:50%; border:2px solid #0099aa; color:#0099aa; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; }
-.notes-card { background:#fff; border-radius:16px; margin-bottom:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.notes-header { padding:14px 16px; display:flex; align-items:center; justify-content:flex-end; gap:8px; }
-.notes-label { font-size:14px; color:#aaa; }
-.notes-field { width:100%; padding:0 16px 14px; border:none; outline:none; font-size:13px; color:#555; font-family:"Tajawal",sans-serif; background:#fff; text-align:right; resize:none; min-height:80px; }
-.notes-field::placeholder { color:#ccc; }
-.summary-card { background:#fff; border-radius:16px; padding:16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.summary-title { font-size:15px; font-weight:900; color:#1a1a2e; text-align:right; margin-bottom:14px; }
-.summary-row { display:flex; justify-content:space-between; margin-bottom:10px; }
-.summary-row:last-child { border-top:1px dashed #eee; padding-top:10px; margin-bottom:0; }
-.s-label { font-size:13px; color:#aaa; }
-.s-val { font-size:13px; font-weight:700; color:#555; }
-.s-val.free { color:#0099aa; }
-.s-val.total { font-size:15px; font-weight:900; color:#1a1a2e; }
-.bottom-bar { padding:12px 16px 16px; background:#f0f0f5; flex-shrink:0; }
+<!-- ===== حسابي ===== -->
+<div class="screen" id="account">
+  <div class="top-bar"><div style="width:36px;"></div><div class="hdr-title">حسابي</div><div style="width:36px;"></div></div>
+  <div class="scroll" style="padding:0 16px 20px;">
+    <div id="user-info" style="display:none;background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);align-items:center;gap:14px;">
+      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👤</div>
+      <div style="flex:1;text-align:right;"><div id="user-name-lbl" style="font-size:16px;font-weight:900;color:#1a1a2e;"></div><div id="user-phone-lbl" style="font-size:13px;color:#aaa;"></div></div>
+      <div onclick="doLogout()" style="font-size:11px;color:#e53935;font-weight:700;cursor:pointer;padding:5px 10px;border:1px solid #ffcdd2;border-radius:8px;">خروج</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <div id="login-menu-row" class="menu-row" onclick="goTo('otp')"><div class="menu-label">تسجيل الدخول</div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0099aa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="menu-row" onclick="goTo('tracking')"><div class="menu-label">طلباتي</div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="menu-row" onclick="showLangPicker()"><div class="menu-label">🌐 اللغة</div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+      <div class="menu-row"><div class="menu-label">الدعم الفني</div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4" fill="#0099aa"/></svg><div class="nav-lbl on">حسابي</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
 
-/* ============ ORDER SUCCESS ============ */
-#order_success { background:#f0f0f5; }
-.success-wrap { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:20px; }
-.circle-outer { width:120px; height:120px; border-radius:50%; background:rgba(0,153,170,0.1); display:flex; align-items:center; justify-content:center; animation:pulse2 2s ease-in-out infinite; }
-@keyframes pulse2 { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-.circle-inner { width:90px; height:90px; border-radius:50%; background:#0099aa; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,153,170,0.4); }
-.check-txt { font-size:40px; color:#fff; font-weight:900; }
-.success-title { font-size:22px; font-weight:900; color:#1a1a2e; text-align:center; }
-.success-sub { font-size:13px; color:#aaa; text-align:center; line-height:1.6; }
-.order-num-box { background:#fff; border-radius:14px; padding:12px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; }
-.on-label { font-size:11px; color:#aaa; margin-bottom:4px; }
-.on-val { font-size:18px; font-weight:900; color:#0099aa; letter-spacing:2px; }
-.status-row { display:flex; gap:10px; width:100%; }
-.status-item { flex:1; background:#fff; border-radius:14px; padding:12px 10px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-.si-label { font-size:10px; color:#aaa; font-weight:700; }
-.si-val { font-size:11px; font-weight:900; color:#1a1a2e; margin-top:4px; }
-.btns { width:100%; display:flex; flex-direction:column; gap:10px; padding:0 0 10px; }
+<!-- ===== تسجيل الدخول ===== -->
+<div class="screen" id="otp">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('account')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title">تسجيل الدخول</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px 24px;overflow-y:auto;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,153,170,0.3);"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <div style="font-size:20px;font-weight:900;color:#1a1a2e;margin-bottom:6px;">أدخل بياناتك</div>
+    <div style="font-size:13px;color:#aaa;text-align:center;margin-bottom:24px;">لحفظ طلباتك وتتبعها</div>
+    <div style="width:100%;margin-bottom:12px;">
+      <div style="font-size:12px;color:#666;margin-bottom:6px;text-align:right;font-weight:700;">الاسم الكامل</div>
+      <input id="inp-name" type="text" placeholder="أدخل اسمك" class="input-box"/>
+    </div>
+    <div style="width:100%;margin-bottom:20px;">
+      <div style="font-size:12px;color:#666;margin-bottom:6px;text-align:right;font-weight:700;">رقم الهاتف</div>
+      <input id="inp-phone" type="tel" placeholder="07xxxxxxxxx" class="input-box" style="direction:ltr;"/>
+    </div>
+    <button class="btn-main" style="margin-bottom:12px;" onclick="doLogin()">تسجيل الدخول ←</button>
+    <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:12px;"><div style="flex:1;height:1px;background:#eee;"></div><div style="font-size:12px;color:#aaa;">أو</div><div style="flex:1;height:1px;background:#eee;"></div></div>
+    <button class="btn-sec" onclick="doGuestLogin()">دخول كضيف 👤</button>
+    <div style="font-size:11px;color:#ccc;text-align:center;margin-top:12px;">الضيف يتصفح فقط ولا يستطيع الشراء</div>
+  </div>
 
-/* ============ TRACKING ============ */
-.tabs-wrap { display:flex; gap:8px; padding:0 16px; margin-bottom:12px; overflow-x:auto; flex-shrink:0; }
-.tabs-wrap::-webkit-scrollbar { display:none; }
-.tab-btn2 { padding:8px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; border:none; font-family:"Tajawal",sans-serif; background:#fff; color:#aaa; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
-.tab-btn2.on { background:#0099aa; color:#fff; }
-.order-card { background:#fff; border-radius:16px; padding:16px; margin:0 16px 12px; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-.order-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f5f5f5; }
-.order-num { font-size:13px; font-weight:900; color:#1a1a2e; }
-.order-date { font-size:11px; color:#aaa; }
-.status-badge { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:900; }
-.s-pending{background:#fff8e1;color:#f57f17;}
-.s-delivered{background:#e8f5e9;color:#2e7d32;}
-.steps-row { display:flex; align-items:flex-start; justify-content:space-between; }
-.step { display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; position:relative; }
-.step:not(:last-child)::after { content:""; position:absolute; top:16px; left:calc(50% + 16px); width:calc(100% - 32px); height:2px; background:#e0e0e0; z-index:0; }
-.step.done:not(:last-child)::after { background:#0099aa; }
-.step-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:1; font-size:13px; }
-.step.done .step-icon { background:#0099aa; }
-.step.pend .step-icon { background:#f5f5f5; border:2px solid #e0e0e0; }
-.step-title { font-size:10px; font-weight:900; color:#1a1a2e; text-align:center; }
-.step.pend .step-title { color:#aaa; }
-.step-time { font-size:9px; color:#aaa; }
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">تسوق</div></div>
+  </div>
+</div>
+<div class="screen" id="checkout">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('cart')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title">فاتورة الشراء</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="padding:10px 16px 20px;">
+    <!-- رأس الفاتورة -->
+    <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);text-align:center;">
+      <div style="font-family:Orbitron,monospace;font-weight:900;font-size:18px;color:#0099aa;letter-spacing:3px;">NEXCARD</div>
+      <div style="font-size:12px;color:#aaa;margin-top:4px;">فاتورة شراء</div>
+      <div style="display:flex;justify-content:space-between;background:#f8f8f8;border-radius:10px;padding:8px 12px;margin-top:10px;">
+        <div style="text-align:left;"><div style="font-size:10px;color:#aaa;">الوقت</div><div id="inv-time" style="font-size:12px;font-weight:900;color:#1a1a2e;">--:--</div></div>
+        <div><div style="font-size:10px;color:#aaa;">رقم الطلب</div><div id="inv-num" style="font-size:12px;font-weight:900;color:#0099aa;">#000000</div></div>
+        <div style="text-align:right;"><div style="font-size:10px;color:#aaa;">التاريخ</div><div id="inv-date" style="font-size:12px;font-weight:900;color:#1a1a2e;">--/--/----</div></div>
+      </div>
+    </div>
+    <!-- بيانات العميل -->
+    <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">👤 بيانات العميل</div>
+      <input id="inv-name" type="text" placeholder="الاسم الكامل" class="input-box" style="margin-bottom:8px;"/>
+      <input id="inv-phone" type="tel" placeholder="رقم الهاتف" class="input-box" style="direction:ltr;"/>
+    </div>
+    <!-- المنتجات -->
+    <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">🛒 تفاصيل الطلب</div>
+      <div id="inv-items"></div>
+      <div style="border-top:1px dashed #e0e0e0;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;">
+        <div id="inv-total" style="font-size:15px;font-weight:900;color:#0099aa;">0 د.ع</div>
+        <div style="font-size:13px;color:#aaa;">الإجمالي</div>
+      </div>
+    </div>
+    <!-- طريقة الدفع -->
+    <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">💳 طريقة الدفع</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="pay-grid">
+        <div class="pay-opt sel" onclick="selectPay(this,'زين كاش')"><div style="font-size:18px;">📱</div><div style="font-size:11px;font-weight:700;">زين كاش</div></div>
+        <div class="pay-opt" onclick="selectPay(this,'آسيا حوالة')"><div style="font-size:18px;">🏦</div><div style="font-size:11px;font-weight:700;">آسيا حوالة</div></div>
+        <div class="pay-opt" onclick="selectPay(this,'سوبر كي')"><div style="font-size:18px;">🔑</div><div style="font-size:11px;font-weight:700;">سوبر كي</div></div>
+        <div class="pay-opt" onclick="selectPay(this,'كورك')"><div style="font-size:18px;">💰</div><div style="font-size:11px;font-weight:700;">كورك</div></div>
+      </div>
+    </div>
+    <!-- ملاحظات -->
+    <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:8px;text-align:right;">📝 ملاحظات</div>
+      <textarea id="inv-notes" placeholder="ملاحظاتك..." style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:13px;font-family:Tajawal,sans-serif;color:#555;text-align:right;outline:none;resize:none;min-height:70px;background:#f8f8f8;"></textarea>
+    </div>
+    <!-- رفع صورة الوصل -->
+    <div style="background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">📎 صورة الحوالة</div>
+      <div id="receipt-preview" style="display:none;margin-bottom:10px;border-radius:10px;overflow:hidden;">
+        <img id="receipt-img" style="width:100%;border-radius:10px;" />
+      </div>
+      <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:2px dashed #0099aa;border-radius:12px;cursor:pointer;background:#f0fbfb;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0099aa" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span style="font-size:13px;color:#0099aa;font-weight:700;" id="receipt-label">ارفع صورة الحوالة</span>
+        <input type="file" accept="image/*" onchange="previewReceipt(this)" style="display:none;"/>
+      </label>
+    </div>
 
-/* ============ CODE RECEIVED ============ */
-#code_received { background:#f0f0f5; }
-.success-banner { background:linear-gradient(135deg,#0099aa,#00c8c8); border-radius:20px; padding:22px 20px; text-align:center; margin:10px 16px 12px; position:relative; overflow:hidden; }
-.success-banner::before { content:""; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.08); }
-.sb-icon { font-size
+    <div style="background:#fff8e1;border-radius:12px;padding:10px 14px;margin-bottom:10px;text-align:center;">
+      <div style="font-size:12px;color:#f57f17;font-weight:700;">🟡 الحالة: قيد المراجعة</div>
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">سيتم إرسال الكود على واتساب بعد التحقق</div>
+    </div>
+  </div>
+  <div style="padding:12px 16px 20px;background:#f5f5f5;flex-shrink:0;">
+    <button class="btn-main" onclick="confirmOrder()">تأكيد وإرسال الطلب 💬</button>
+  </div>
+
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">تسوق</div></div>
+  </div>
+</div>
+<div class="screen" id="order_success">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;gap:14px;">
+    <div style="width:110px;height:110px;border-radius:50%;background:rgba(0,153,170,0.1);display:flex;align-items:center;justify-content:center;animation:pulse 2s infinite;">
+      <div style="width:82px;height:82px;border-radius:50%;background:#0099aa;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,153,170,0.4);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+    <div style="font-size:22px;font-weight:900;color:#1a1a2e;text-align:center;">تم إرسال طلبك! 🎉</div>
+    <div style="font-size:13px;color:#aaa;text-align:center;line-height:1.6;">طلبك قيد المراجعة<br>سيصلك الكود على واتساب قريباً</div>
+    <div style="background:#fff;border-radius:14px;padding:12px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-size:11px;color:#aaa;">رقم الطلب</div>
+      <div id="success-num" style="font-size:18px;font-weight:900;color:#0099aa;letter-spacing:2px;">#000000</div>
+    </div>
+    <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-top:10px;">
+      <button class="btn-main" onclick="goTo('home')">العودة للرئيسية 🏠</button>
+      <button class="btn-sec" onclick="goTo('tracking')">تتبع طلبي 📦</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">تسوق</div></div>
+  </div>
+</div>
+<div class="screen" id="notifications">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title">الإشعارات</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="padding:16px;">
+    <div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#e0f5f5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🎉</div>
+      <div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:#1a1a2e;">مرحباً بك في NexCard!</div><div style="font-size:12px;color:#aaa;margin-top:3px;">أفضل الأسعار على بطاقاتك الرقمية</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Lang Popup -->
+<div id="lang-ov" onclick="hideLang()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;"></div>
+<div id="lang-pop" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;z-index:201;max-width:430px;margin:0 auto;">
+  <div style="width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px;"></div>
+  <div style="font-size:16px;font-weight:900;color:#1a1a2e;text-align:center;margin-bottom:20px;">اختر اللغة</div>
+  <div onclick="setLang('ar')" id="lang-ar" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:14px;margin-bottom:10px;cursor:pointer;border:2px solid #0099aa;background:#f0fbfb;">
+    <div id="lang-ar-check" style="width:22px;height:22px;border-radius:50%;background:#0099aa;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;">✓</div>
+    <div style="display:flex;align-items:center;gap:10px;"><div style="font-size:14px;font-weight:900;color:#1a1a2e;">العربية</div><div style="font-size:24px;">🇮🇶</div></div>
+  </div>
+  <div onclick="setLang('en')" id="lang-en" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:14px;cursor:pointer;border:2px solid #e0e0e0;background:#fff;">
+    <div id="lang-en-check" style="width:22px;height:22px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;">✓</div>
+    <div style="display:flex;align-items:center;gap:10px;"><div style="font-size:14px;font-weight:900;color:#1a1a2e;">English</div><div style="font-size:24px;">🇺🇸</div></div>
+  </div>
+</div>
+
+<!-- ===== شاشة البحث ===== -->
+<div class="screen" id="search">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title">البحث</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div style="padding:10px 16px;flex-shrink:0;">
+    <div style="background:#fff;border-radius:13px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0099aa" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-inp" type="text" placeholder="ابحث عن منتج..." oninput="doSearch(this.value)" style="flex:1;border:none;outline:none;font-size:14px;font-family:Tajawal,sans-serif;color:#1a1a2e;background:transparent;text-align:right;" autofocus/>
+      <div onclick="document.getElementById('search-inp').value='';doSearch('');" style="color:#aaa;font-size:18px;cursor:pointer;">✕</div>
+    </div>
+  </div>
+  <div id="search-results" class="scroll" style="padding:0 16px 80px;">
+    <div style="text-align:center;padding:40px;color:#aaa;">
+      <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+      <div style="font-size:14px;">ابحث عن أي منتج</div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">الحساب</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">تسوق</div></div>
+  </div>
+</div>
+
+
+<div class="screen" id="cat_products">
+  <div class="top-bar">
+    <div class="back-btn" onclick="goTo('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="hdr-title" id="cat-title">المنتجات</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="background:#f0f0f5;padding:12px 12px 80px;">
+    <div id="cat-grid" class="card2"></div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('account')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div class="nav-lbl">حسابي</div></div>
+    <div class="nav-btn" onclick="goTo('tracking')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><div class="nav-lbl">بطاقاتي</div></div>
+    <div class="nav-btn" onclick="goTo('cart')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><div class="nav-lbl">السلة</div></div>
+    <div class="nav-btn" onclick="goTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
+
+</div><!-- end app -->
+
+<script>
+// ===== Navigation =====
+let cur = 'home';
+let prevScreen = 'home';
+
+function goTo(id) {
+  if(!document.getElementById(id)) return;
+  document.getElementById(cur).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  prevScreen = cur;
+  cur = id;
+  if(id === 'cart') renderCart();
+  if(id === 'tracking') renderTracking();
+  if(id === 'checkout') openInvoice();
+}
+
+function goBack() {
+  goTo(prevScreen);
+}
+
+// ===== Toast =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2200);
+}
+
+// ===== Slider =====
+let slideIdx = 0;
+setInterval(() => {
+  slideIdx = (slideIdx + 1) % 3;
+  const s = document.getElementById('slider');
+  if(s) s.style.transform = `translateX(${slideIdx * 100}%)`;
+  const dots = document.querySelectorAll('#dots div');
+  dots.forEach((d,i) => {
+    d.style.width = i === slideIdx ? '20px' : '7px';
+    d.style.opacity = i === slideIdx ? '1' : '0.5';
+  });
+}, 3500);
+
+// ===== بيانات الشركات =====
+const BRANDS = {
+  'PlayStation': { color:'linear-gradient(135deg,#003087,#0070cc)', icon:'🎮', products:[
+    {name:'Network 10$', price:13000}, {name:'Network 20$', price:25000},
+    {name:'Network 50$', price:60000}, {name:'PS Plus شهري', price:18000}
+  ]},
+  'Xbox': { color:'linear-gradient(135deg,#107c10,#52b043)', icon:'🟢', products:[
+    {name:'Game Pass 1 شهر', price:17000}, {name:'Gift Card 10$', price:13000},
+    {name:'Gift Card 25$', price:32000}
+  ]},
+  'Steam': { color:'linear-gradient(135deg,#1b2838,#2a475e)', icon:'🔵', products:[
+    {name:'Wallet 5$', price:7000}, {name:'Wallet 10$', price:13500},
+    {name:'Wallet 20$', price:26000}, {name:'Wallet 50$', price:63000}
+  ]},
+  'Nintendo': { color:'linear-gradient(135deg,#e4000f,#ff6b6b)', icon:'🎲', products:[
+    {name:'eShop 10$', price:13000}, {name:'eShop 20$', price:25000}, {name:'eShop 35$', price:43000}
+  ]},
+  'Free Fire': { color:'linear-gradient(135deg,#ff6600,#ff9900)', icon:'🎯', products:[
+    {name:'100 جوهرة', price:5000}, {name:'310 جوهرة', price:14000},
+    {name:'520 جوهرة', price:23000}, {name:'1060 جوهرة', price:45000}
+  ]},
+  'Fortnite': { color:'linear-gradient(135deg,#5865F2,#7289da)', icon:'⚡', products:[
+    {name:'1000 V-Bucks', price:9000}, {name:'2800 V-Bucks', price:23000}, {name:'5000 V-Bucks', price:40000}
+  ]}
+};
+
+
+
+function sendSupportMsg() {
+  window.open('https://wa.me/9647726893982?text=' + encodeURIComponent('مرحباً، أحتاج مساعدة في تطبيق NexCard'), '_blank');
+}
+
+function openBrand(brand) {
+  const b = BRANDS[brand];
+  if(!b) return;
+  // تحديث brand_products
+  document.getElementById('brand-title').textContent = brand;
+  const grid = document.getElementById('brand-grid');
+  // تحديث cat_products أيضاً
+  document.getElementById('cat-title').textContent = brand;
+  const catGrid = document.getElementById('cat-grid');
+  const html = b.products.map(p => `
+    <div class="prod-card" onclick="openProduct('${brand}','${p.name}',${p.price},'${b.icon}','${b.color}')">
+      <div class="prod-img" style="background:${b.color};">
+        <span class="prod-fav" onclick="event.stopPropagation();toggleFav('${brand} ${p.name}',${p.price},'${b.icon}')">🤍</span>
+        ${b.icon}
+      </div>
+      <div class="prod-body">
+        <div class="prod-brand">${brand}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-bottom">
+          <div class="prod-price">${p.price.toLocaleString()} د.ع</div>
+          <div class="add-btn" onclick="event.stopPropagation();addToCart('${brand} ${p.name}',${p.price},'${b.icon}')">+</div>
+        </div>
+      </div>
+    </div>`).join('');
+  if(grid) grid.innerHTML = html;
+  if(catGrid) catGrid.innerHTML = html;
+  goTo('brand_products');
+}
+
+// ===== المنتج الحالي =====
+let curProduct = {};
+
+function openProduct(brand, name, price, icon, color) {
+  curProduct = {brand, name, price, icon, color};
+  document.getElementById('pd-img').style.background = color;
+  document.getElementById('pd-img').textContent = icon;
+  document.getElementById('pd-name').textContent = brand + ' — ' + name;
+  document.getElementById('pd-price').textContent = price.toLocaleString() + ' د.ع';
+  goTo('product_detail');
+}
+
+function addCurrentToCart() {
+  if(!checkLogin()) return;
+  addToCart(curProduct.brand + ' ' + curProduct.name, curProduct.price, curProduct.icon);
+}
+
+function toggleFavDetail() {
+  if(!checkLogin()) return;
+  const btn = document.getElementById('fav-btn');
+  toggleFav(curProduct.brand + ' ' + curProduct.name, curProduct.price, curProduct.icon, btn);
+}
+
+// ===== السلة =====
+let cart = [];
+let cartCount = 0;
+
+function checkLogin() {
+  if(isGuest || !currentUser) {
+    showLoginPopup();
+    return false;
+  }
+  return true;
+}
+
+function addToCart(name, price, icon) {
+  if(!checkLogin()) return;
+  cart.push({id: Date.now(), name, price, icon});
+  cartCount++;
+  toast('تمت الإضافة للسلة! 🛒');
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(i => i.id !== id);
+  cartCount = cart.length;
+  renderCart();
+}
+
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  if(!body) return;
+  if(cart.length === 0) {
+    body.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;">
+      <div style="font-size:60px;">🛒</div>
+      <div style="font-size:16px;font-weight:900;color:#1a1a2e;">السلة فارغة</div>
+      <div style="font-size:13px;color:#aaa;">أضف منتجات للبدء</div>
+      <button class="btn-main" style="width:200px;" onclick="goTo('home')">تسوق الآن</button>
+    </div>`;
+    return;
+  }
+  let total = 0;
+  let html = '<div style="padding:10px 16px;">';
+  cart.forEach(item => {
+    total += item.price;
+    html += `<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="font-size:34px;">${item.icon}</div>
+      <div style="flex:1;text-align:right;"><div style="font-size:13px;font-weight:900;color:#1a1a2e;">${item.name}</div><div style="font-size:13px;color:#0099aa;font-weight:700;">${item.price.toLocaleString()} د.ع</div></div>
+      <div onclick="removeFromCart(${item.id})" style="width:28px;height:28px;border-radius:50%;background:#fee;display:flex;align-items:center;justify-content:center;color:#e53935;font-size:14px;cursor:pointer;">✕</div>
+    </div>`;
+  });
+  html += `<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+    <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;font-size:13px;">المجموع</span><span style="font-size:15px;font-weight:900;color:#0099aa;">${total.toLocaleString()} د.ع</span></div>
+  </div>
+  <button class="btn-main" onclick="goTo('checkout')">المتابعة للدفع ←</button></div>`;
+  body.innerHTML = html;
+}
+
+// ===== المفضلة =====
+let favs = [];
+
+function toggleFav(name, price, icon, btnEl) {
+  const idx = favs.findIndex(f => f.name === name);
+  if(idx === -1) {
+    favs.push({name, price, icon});
+    if(btnEl) btnEl.textContent = '❤️';
+    toast('أُضيف للمفضلة ❤️');
+  } else {
+    favs.splice(idx, 1);
+    if(btnEl) btnEl.textContent = '🤍';
+    toast('حُذف من المفضلة');
+  }
+}
+
+// ===== التبويبات =====
+function switchTab(tab) {
+  const isOrders = tab === 'orders';
+  document.getElementById('panel-orders').style.display = isOrders ? 'block' : 'none';
+  document.getElementById('panel-favs').style.display = isOrders ? 'none' : 'block';
+  document.getElementById('tab-orders').style.background = isOrders ? '#0099aa' : '#fff';
+  document.getElementById('tab-orders').style.color = isOrders ? '#fff' : '#aaa';
+  document.getElementById('tab-favs').style.background = isOrders ? '#fff' : '#0099aa';
+  document.getElementById('tab-favs').style.color = isOrders ? '#aaa' : '#fff';
+  if(!isOrders) renderFavs();
+}
+
+function renderFavs() {
+  const el = document.getElementById('panel-favs');
+  if(!el) return;
+  if(favs.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#aaa;"><div style="font-size:50px;margin-bottom:12px;">🤍</div><div style="font-size:15px;font-weight:700;">لا توجد مفضلة</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="card2" style="padding:10px 12px;">' + favs.map(f => `
+    <div class="prod-card" onclick="openProduct('','${f.name}',${f.price},'${f.icon}','linear-gradient(135deg,#0099aa,#00c8c8)')">
+      <div class="prod-img" style="background:linear-gradient(135deg,#0099aa,#00c8c8);">${f.icon}</div>
+      <div class="prod-body"><div class="prod-name">${f.name}</div>
+      <div class="prod-bottom"><div class="prod-price">${f.price.toLocaleString()} د.ع</div>
+      <div class="add-btn" onclick="event.stopPropagation();addToCart('${f.name}',${f.price},'${f.icon}')">+</div></div></div>
+    </div>`).join('') + '</div>';
+}
+
+function renderTracking() {
+  const el = document.getElementById('panel-orders');
+  if(!el) return;
+  if(!currentUser || isGuest) {
+    el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#aaa;"><div style="font-size:50px;margin-bottom:12px;">📦</div><div style="font-size:15px;font-weight:700;">سجل دخولك لرؤية طلباتك</div><br><button class="btn-main" style="width:180px;" onclick="goTo(\'otp\')">تسجيل الدخول</button></div>';
+    return;
+  }
+  if(!db) {
+    el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#aaa;"><div style="font-size:50px;margin-bottom:12px;">📦</div><div style="font-size:15px;font-weight:700;">لا توجد طلبات بعد</div></div>';
+    return;
+  }
+  el.innerHTML = '<div style="text-align:center;padding:40px;"><div style="width:30px;height:30px;border:3px solid #0099aa;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div></div>';
+  db.ref('orders').orderByChild('userId').equalTo(currentUser).on('value', snap => {
+    const orders = [];
+    snap.forEach(c => orders.unshift({id:c.key,...c.val()}));
+    if(orders.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#aaa;"><div style="font-size:50px;margin-bottom:12px;">📦</div><div style="font-size:15px;font-weight:700;">لا توجد طلبات بعد</div></div>';
+      return;
+    }
+    el.innerHTML = '<div style="padding:10px 16px;">' + orders.map(o => {
+      const d = new Date(o.timestamp);
+      const date = d.toLocaleDateString('ar-IQ');
+      const time = d.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'});
+      const st = ORDER_STATUS[o.status] || ORDER_STATUS['قيد الانتظار'];
+      return `<div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5;">
+          <div style="font-size:11px;background:${st.bg};color:${st.color};padding:3px 10px;border-radius:20px;font-weight:900;">${st.icon} ${o.status}</div>
+          <div style="text-align:right;"><div style="font-size:13px;font-weight:900;color:#1a1a2e;">${o.orderId}</div><div style="font-size:10px;color:#aaa;">${date} • ${time}</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;font-weight:900;color:#0099aa;">${Number(o.price).toLocaleString()} د.ع</div>
+          <div style="font-size:13px;color:#555;">${o.product}</div>
+        </div>
+
+      </div>`;
+    }).join('') + '</div>';
+  });
+}
+
+// ===== البحث =====
+function doSearch(query) {
+  const results = document.getElementById('search-results');
+  if(!results) return;
+  query = query.trim().toLowerCase();
+  if(!query) {
+    results.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;margin-bottom:10px;">🔍</div><div style="font-size:14px;">ابحث عن أي منتج</div></div>';
+    return;
+  }
+  // ابحث في كل المنتجات
+  let found = [];
+  Object.entries(BRANDS).forEach(([brand, b]) => {
+    b.products.forEach(p => {
+      if(brand.toLowerCase().includes(query) || p.name.toLowerCase().includes(query)) {
+        found.push({brand, ...p, icon: b.icon, color: b.color});
+      }
+    });
+  });
+  if(found.length === 0) {
+    results.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;margin-bottom:10px;">😕</div><div style="font-size:14px;">لا توجد نتائج</div></div>';
+    return;
+  }
+  results.innerHTML = '<div class="card2" style="padding-top:10px;">' + found.map(p => `
+    <div class="prod-card" onclick="openProduct('${p.brand}','${p.name}',${p.price},'${p.icon}','${p.color}')">
+      <div class="prod-img" style="background:${p.color};">${p.icon}</div>
+      <div class="prod-body">
+        <div class="prod-brand">${p.brand}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-bottom">
+          <div class="prod-price">${p.price.toLocaleString()} د.ع</div>
+          <div class="add-btn" onclick="event.stopPropagation();addToCart('${p.brand} ${p.name}',${p.price},'${p.icon}')">+</div>
+        </div>
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+// ===== رفع صورة الوصل =====
+let receiptBase64 = '';
+function previewReceipt(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    receiptBase64 = e.target.result;
+    document.getElementById('receipt-img').src = receiptBase64;
+    document.getElementById('receipt-preview').style.display = 'block';
+    document.getElementById('receipt-label').textContent = '✅ تم رفع الصورة';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== حالات الطلب =====
+const ORDER_STATUS = {
+  'قيد الانتظار': { color:'#f57f17', bg:'#fff8e1', icon:'⏳' },
+  'جاري التنفيذ': { color:'#1565c0', bg:'#e3f2fd', icon:'🔄' },
+  'مكتمل':        { color:'#2e7d32', bg:'#e8f5e9', icon:'✅' },
+  'ملغي':         { color:'#e53935', bg:'#ffebee', icon:'❌' },
+};
+
+
+let currentUser = null;
+let currentUserName = '';
+let currentUserPhone = '';
+let isGuest = false;
+
+function doLogin() {
+  const name = document.getElementById('inp-name').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
+  if(!name) { toast('⚠️ أدخل اسمك'); return; }
+  if(!phone || phone.length < 7) { toast('⚠️ أدخل رقم هاتف صحيح'); return; }
+  currentUser = phone.replace(/\D/g,'');
+  currentUserName = name;
+  currentUserPhone = phone;
+  isGuest = false;
+  localStorage.setItem('nc_name', name);
+  localStorage.setItem('nc_phone', phone);
+  localStorage.setItem('nc_user', currentUser);
+  updateAccountUI();
+  toast('✅ مرحباً ' + name + '!');
+  setTimeout(() => goTo('home'), 400);
+}
+
+function doGuestLogin() {
+  currentUser = null; isGuest = true;
+  toast('👤 دخلت كضيف');
+  setTimeout(() => goTo('home'), 400);
+}
+
+function doLogout() {
+  currentUser = null; currentUserName = ''; currentUserPhone = ''; isGuest = false;
+  localStorage.removeItem('nc_name'); localStorage.removeItem('nc_phone'); localStorage.removeItem('nc_user');
+  updateAccountUI();
+  toast('تم تسجيل الخروج');
+}
+
+function updateAccountUI() {
+  const info = document.getElementById('user-info');
+  const loginRow = document.getElementById('login-menu-row');
+  if(currentUser && !isGuest) {
+    info.style.display = 'flex';
+    loginRow.style.display = 'none';
+    document.getElementById('user-name-lbl').textContent = currentUserName;
+    document.getElementById('user-phone-lbl').textContent = currentUserPhone;
+  } else {
+    info.style.display = 'none';
+    loginRow.style.display = 'flex';
+  }
+}
+
+function loadSavedUser() {
+  const name = localStorage.getItem('nc_name');
+  const phone = localStorage.getItem('nc_phone');
+  const user = localStorage.getItem('nc_user');
+  if(name && phone && user) {
+    currentUser = user; currentUserName = name; currentUserPhone = phone; isGuest = false;
+    setTimeout(updateAccountUI, 100);
+  }
+}
+
+function showLoginPopup() {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:flex-end;';
+  ov.innerHTML = `<div style="background:#fff;width:100%;border-radius:24px 24px 0 0;padding:28px 20px 40px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:12px;">🔐</div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;margin-bottom:6px;">تسجيل الدخول مطلوب</div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:20px;">سجل دخولك للشراء وتتبع طلباتك</div>
+    <button onclick="this.closest('div[style]').parentElement.remove();goTo('otp');" class="btn-main" style="margin-bottom:10px;">تسجيل الدخول ←</button>
+    <button onclick="this.closest('div[style]').parentElement.remove();" class="btn-sec">متابعة التصفح</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if(e.target===ov) ov.remove(); });
+}
+
+// ===== الفاتورة =====
+let selectedPay = 'زين كاش';
+let currentOrderId = '';
+
+function openInvoice() {
+  const now = new Date();
+  currentOrderId = '#' + (100000 + Math.floor(Math.random() * 900000));
+  document.getElementById('inv-num').textContent = currentOrderId;
+  document.getElementById('inv-date').textContent = now.toLocaleDateString('ar-IQ');
+  document.getElementById('inv-time').textContent = now.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'});
+  if(currentUserName) document.getElementById('inv-name').value = currentUserName;
+  if(currentUserPhone) document.getElementById('inv-phone').value = currentUserPhone;
+  const items = cart.length > 0 ? cart : [{name:'PlayStation Network 10$', price:13000, icon:'🎮'}];
+  let total = 0;
+  let html = '';
+  items.forEach(i => {
+    total += i.price;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f5f5f5;">
+      <div style="font-size:13px;font-weight:900;color:#0099aa;">${i.price.toLocaleString()} د.ع</div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="font-size:12px;color:#1a1a2e;font-weight:700;">${i.name}</div><div style="font-size:20px;">${i.icon}</div></div>
+    </div>`;
+  });
+  document.getElementById('inv-items').innerHTML = html;
+  document.getElementById('inv-total').textContent = total.toLocaleString() + ' د.ع';
+}
+
+function selectPay(el, method) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedPay = method;
+}
+
+async function confirmOrder() {
+  const name = document.getElementById('inv-name').value.trim();
+  const phone = document.getElementById('inv-phone').value.trim();
+  const notes = document.getElementById('inv-notes').value.trim();
+  if(!name) { toast('⚠️ أدخل اسمك'); return; }
+  if(!phone) { toast('⚠️ أدخل رقم هاتفك'); return; }
+  if(!receiptBase64) { toast('⚠️ ارفع صورة الحوالة أولاً'); return; }
+  let total = 0, items = '';
+  const cartItems = cart.length > 0 ? cart : [{name:'PlayStation Network 10$',price:13000,icon:'🎮'}];
+  cartItems.forEach(i => { total += i.price; items += '📦 '+i.name+' — '+i.price.toLocaleString()+' د.ع\n'; });
+  if(db) {
+    try {
+      await db.ref('orders').push({
+        orderId: currentOrderId, name, phone: phone.replace(/\D/g,''),
+        product: cartItems[0].name, price: total, payMethod: selectedPay,
+        notes, userId: currentUser || phone.replace(/\D/g,''),
+        status: 'قيد الانتظار', code: '', timestamp: Date.now()
+      });
+    } catch(e) { console.log(e); }
+  }
+  const msg = encodeURIComponent([
+    '🧾 *فاتورة شراء - NexCard*','━━━━━━━━━━━━━━━',
+    '🔢 '+currentOrderId,'📅 '+new Date().toLocaleDateString('ar-IQ'),
+    '━━━━━━━━━━━━━━━', items.trim(),
+    '💰 '+total.toLocaleString()+' د.ع','💳 '+selectedPay,
+    '━━━━━━━━━━━━━━━','👤 '+name,'📱 '+phone,
+    notes?'📝 '+notes:'','━━━━━━━━━━━━━━━',
+    '🟡 قيد المراجعة','✅ سأرسل صورة الحوالة الآن'
+  ].filter(Boolean).join('\n'));
+  window.open('https://wa.me/9647726893982?text='+msg,'_blank');
+  document.getElementById('success-num').textContent = currentOrderId;
+  cart = []; cartCount = 0;
+  receiptBase64 = '';
+  document.getElementById('receipt-label').textContent = 'ارفع صورة الحوالة';
+  document.getElementById('receipt-preview').style.display = 'none';
+  setTimeout(() => goTo('order_success'), 500);
+}
+
+// ===== اللغة =====
+function showLangPicker() {
+  document.getElementById('lang-ov').style.display = 'block';
+  document.getElementById('lang-pop').style.display = 'block';
+}
+function hideLang() {
+  document.getElementById('lang-ov').style.display = 'none';
+  document.getElementById('lang-pop').style.display = 'none';
+}
+function setLang(lang) {
+  if(lang==='en') {
+    document.documentElement.setAttribute('dir','ltr');
+    document.documentElement.setAttribute('lang','en');
+    toast('🌐 Language: English');
+  } else {
+    document.documentElement.setAttribute('dir','rtl');
+    document.documentElement.setAttribute('lang','ar');
+    toast('🌐 اللغة: العربية');
+  }
+  hideLang();
+}
+
+// ===== Firebase =====
+let db = null;
+function initFirebase() {
+  if(typeof firebase === 'undefined') return;
+  if(!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey:"AIzaSyCRQlZ3w0TQ6xbLhp1Gl_8o2DJvjsoQf-E",
+      authDomain:"nexcard-2b2cb.firebaseapp.com",
+      databaseURL:"https://nexcard-2b2cb-default-rtdb.firebaseio.com",
+      projectId:"nexcard-2b2cb",
+      storageBucket:"nexcard-2b2cb.firebasestorage.app",
+      messagingSenderId:"1017132001372",
+      appId:"1:1017132001372:web:8aec390fdf63ce98671e99"
+    });
+  }
+  db = firebase.database();
+}
+
+// ===== تشغيل =====
+window.addEventListener('load', () => {
+  initFirebase();
+  loadSavedUser();
+});
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</body>
+</html>
