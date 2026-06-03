@@ -1,0 +1,49 @@
+name: Build NexCard Admin APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/admin.html'
+      - 'lib/main_admin.dart'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+
+      - name: Build Admin APK
+        run: |
+          flutter create --org com.nexcard.iq --project-name nexcard_admin /tmp/admin
+          cp lib/main_admin.dart /tmp/admin/lib/main.dart
+          cp pubspec_admin.yaml /tmp/admin/pubspec.yaml
+          mkdir -p /tmp/admin/assets
+          cp assets/admin.html /tmp/admin/assets/
+          cd /tmp/admin
+          flutter pub get
+          flutter build apk --release
+          cp build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/nexcard-admin.apk
+
+      - name: Upload Admin APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: nexcard-admin-apk
+          path: nexcard-admin.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: admin-v${{ github.run_number }}
+          name: NexCard Admin v${{ github.run_number }}
+          files: nexcard-admin.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
