@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/gestures.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
@@ -52,19 +51,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: WebViewWidget(
-          controller: _ctrl,
-          gestureRecognizers: {
-            Factory<VerticalDragGestureRecognizer>(
-              () => VerticalDragGestureRecognizer(),
-            ),
-            Factory<TapGestureRecognizer>(
-              () => TapGestureRecognizer(),
-            ),
-          },
-        ),
-      ),
+      body: WebViewWidget(controller: _ctrl),
     );
   }
 }
