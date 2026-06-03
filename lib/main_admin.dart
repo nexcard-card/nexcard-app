@@ -62,9 +62,6 @@ class _AdminHomeState extends State<AdminHome> {
             Factory<TapGestureRecognizer>(
               () => TapGestureRecognizer(),
             ),
-            Factory<LongPressGestureRecognizer>(
-              () => LongPressGestureRecognizer(),
-            ),
           },
         ),
       ),
