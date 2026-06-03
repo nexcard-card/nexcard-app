@@ -1,59 +1,260 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NexCard Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { width:100%; height:100%; overflow:hidden; font-family:"Tajawal",sans-serif; background:#111; }
+.app { width:100%; height:100%; position:relative; overflow:hidden; background:#f0f2f5; }
+.screen { position:absolute; top:0; left:0; right:0; bottom:0; display:none; flex-direction:column; overflow:hidden; background:#f0f2f5; }
+.screen.active { display:flex; z-index:10; }
+.scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.scroll::-webkit-scrollbar { display:none; }
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Colors.transparent,
-  ));
-  runApp(const AdminApp());
+/* Login */
+.login-bg { background:linear-gradient(160deg,#060608,#0d1a35); }
+
+/* Top bar */
+.tbar { padding:38px 16px 12px; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.tbar-title { font-size:17px; font-weight:900; color:#1a1a2e; }
+.back-btn { width:36px; height:36px; background:#f0f2f5; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* Cards */
+.stat-card { border-radius:16px; padding:16px; flex:1; }
+.order-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
+
+/* Badge */
+.badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:900; }
+.badge-pending { background:#fff8e1; color:#f57f17; }
+.badge-done { background:#e8f5e9; color:#2e7d32; }
+.badge-review { background:#e3f2fd; color:#1565c0; }
+
+/* Buttons */
+.btn { padding:12px 20px; border:none; border-radius:12px; font-size:14px; font-weight:900; font-family:"Tajawal",sans-serif; cursor:pointer; }
+.btn-primary { background:#0099aa; color:#fff; width:100%; padding:14px; border-radius:13px; }
+.btn-success { background:#2e7d32; color:#fff; }
+.btn-danger { background:#e53935; color:#fff; }
+.btn-outline { background:#fff; border:1.5px solid #0099aa; color:#0099aa; }
+
+/* Input */
+.inp { width:100%; padding:12px 14px; background:#fff; border-radius:12px; border:1.5px solid #e8e8e8; font-size:14px; font-family:"Tajawal",sans-serif; color:#1a1a2e; text-align:right; outline:none; }
+.inp:focus { border-color:#0099aa; }
+
+/* Nav */
+.nav { background:#fff; border-top:1px solid #eee; display:flex; align-items:center; justify-content:space-around; padding:8px 0 16px; flex-shrink:0; }
+.nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 12px; cursor:pointer; }
+.nav-lbl { font-size:10px; color:#aaa; font-weight:700; }
+.nav-lbl.on { color:#0099aa; }
+
+/* Toast */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a1a2e; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; z-index:999; opacity:0; transition:opacity 0.3s; white-space:nowrap; pointer-events:none; }
+
+@keyframes spin { to{transform:rotate(360deg);} }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+@keyframes slideUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="app">
+
+<!-- ===== LOGIN ===== -->
+<div class="screen active login-bg" id="login">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;">
+    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 30px rgba(0,153,170,0.4);">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <div style="font-family:Orbitron,monospace;font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:6px;">NEXCARD</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:40px;">لوحة الإدارة</div>
+    <div style="width:100%;margin-bottom:14px;">
+      <input id="admin-pass" type="password" placeholder="كلمة المرور" class="inp" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff;text-align:center;font-size:16px;letter-spacing:4px;" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+      <div id="login-error" style="color:#ff6b6b;font-size:12px;text-align:center;margin-top:8px;display:none;">كلمة المرور غير صحيحة</div>
+    </div>
+    <button style="width:100%;padding:15px;background:#0099aa;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;-webkit-appearance:none;" onclick="doAdminLogin()">دخول ←</button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="screen" id="dashboard">
+  <div class="tbar">
+    <div style="width:36px;"></div>
+    <div class="tbar-title">📊 لوحة التحكم</div>
+    <div onclick="doLogout()" style="font-size:12px;color:#e53935;font-weight:700;cursor:pointer;">خروج</div>
+  </div>
+  <div class="scroll" style="padding:14px 16px 80px;">
+
+    <!-- إحصائيات -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="stat-card" style="background:linear-gradient(135deg,#0099aa,#00c8c8);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">الطلبات الجديدة</div>
+        <div id="stat-new" style="font-size:28px;font-weight:900;color:#fff;">0</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">قيد الانتظار</div>
+      </div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#2e7d32,#4caf50);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">مكتملة اليوم</div>
+        <div id="stat-done" style="font-size:28px;font-weight:900;color:#fff;">0</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">طلب</div>
+      </div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#1565c0,#1976d2);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">إجمالي المبيعات</div>
+        <div id="stat-total" style="font-size:20px;font-weight:900;color:#fff;">0</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">د.ع</div>
+      </div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">كل الطلبات</div>
+        <div id="stat-all" style="font-size:28px;font-weight:900;color:#fff;">0</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);">طلب</div>
+      </div>
+    </div>
+
+    <!-- أحدث الطلبات -->
+    <div style="font-size:15px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">📦 أحدث الطلبات</div>
+    <div id="recent-orders">
+      <div style="text-align:center;padding:30px;color:#aaa;">
+        <div style="width:30px;height:30px;border:3px solid #0099aa;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;"></div>
+        جاري التحميل...
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('products_mgr')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">المنتجات</div></div>
+    <div class="nav-btn" onclick="goTo('orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nav-lbl">الطلبات</div></div>
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl on">الرئيسية</div></div>
+  </div>
+</div>
+
+<!-- ===== ORDERS ===== -->
+<div class="screen" id="orders">
+  <div class="tbar">
+    <div style="width:36px;"></div>
+    <div class="tbar-title">📦 الطلبات</div>
+    <div style="width:36px;"></div>
+  </div>
+  <!-- فلاتر -->
+  <div style="display:flex;gap:8px;padding:10px 16px;flex-shrink:0;overflow-x:auto;">
+    <button id="filter-all" onclick="filterOrders('all')" style="padding:7px 16px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:12px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
+    <button id="filter-pending" onclick="filterOrders('قيد الانتظار')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #f57f17;background:#fff;color:#f57f17;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">⏳ قيد الانتظار</button>
+    <button id="filter-done" onclick="filterOrders('مكتمل')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #2e7d32;background:#fff;color:#2e7d32;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">✅ مكتمل</button>
+  </div>
+  <div id="orders-list" class="scroll" style="padding:0 16px 80px;"></div>
+  <div class="nav">
+    <div class="nav-btn" onclick="goTo('products_mgr')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">المنتجات</div></div>
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" stroke="#fff" fill="none"/></svg><div class="nav-lbl on">الطلبات</div></div>
+    <div class="nav-btn" onclick="goTo('dashboard')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
+
+<!-- ===== ORDER DETAIL ===== -->
+<div class="screen" id="order_detail">
+  <div class="tbar">
+    <div class="back-btn" onclick="goTo('orders')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="tbar-title">تفاصيل الطلب</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="scroll" style="padding:14px 16px 100px;">
+    <div id="order-detail-content"></div>
+  </div>
+
+</div>
+
+<!-- ===== PRODUCTS MANAGER ===== -->
+<div class="screen" id="products_mgr">
+  <div class="tbar">
+    <div style="width:36px;"></div>
+    <div class="tbar-title">🛍️ إدارة المنتجات</div>
+    <div onclick="showAddProduct()" style="width:36px;height:36px;background:#0099aa;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+  </div>
+  <!-- الشركات tabs -->
+  <div style="display:flex;gap:6px;padding:10px 16px;flex-shrink:0;overflow-x:auto;">
+    <button onclick="filterProducts('all')" id="pb-all" style="padding:6px 14px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:11px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
+    <button onclick="filterProducts('PlayStation')" id="pb-ps" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">PlayStation</button>
+    <button onclick="filterProducts('Xbox')" id="pb-xb" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Xbox</button>
+    <button onclick="filterProducts('Steam')" id="pb-st" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Steam</button>
+    <button onclick="filterProducts('Nintendo')" id="pb-ni" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Nintendo</button>
+  </div>
+  <div id="products-list" class="scroll" style="padding:0 16px 80px;"></div>
+  <div class="nav">
+    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21" stroke="#0099aa"/><line x1="12" y1="17" x2="12" y2="21" stroke="#0099aa"/></svg><div class="nav-lbl on">المنتجات</div></div>
+    <div class="nav-btn" onclick="goTo('orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nav-lbl">الطلبات</div></div>
+    <div class="nav-btn" onclick="goTo('dashboard')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl">الرئيسية</div></div>
+  </div>
+</div>
+
+<!-- ===== ADD/EDIT POPUP ===== -->
+<div id="product-popup-ov" onclick="hideProductPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;"></div>
+<div id="product-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;z-index:201;max-width:430px;margin:0 auto;animation:slideUp 0.3s ease;">
+  <div style="width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px;"></div>
+
+  <!-- tabs: شركة / منتج -->
+  <div id="popup-tabs" style="display:flex;gap:8px;margin-bottom:16px;">
+    <div id="tab-company" onclick="switchPopupTab('company')" style="flex:1;padding:10px;background:#0099aa;color:#fff;border-radius:12px;text-align:center;font-size:13px;font-weight:900;cursor:pointer;">🏢 إضافة شركة</div>
+    <div id="tab-product" onclick="switchPopupTab('product')" style="flex:1;padding:10px;background:#f0f0f0;color:#aaa;border-radius:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;">🎮 إضافة منتج</div>
+  </div>
+
+  <!-- إضافة شركة -->
+  <div id="panel-company">
+    <input id="c-name" type="text" placeholder="اسم الشركة (مثال: PlayStation)" class="inp" style="margin-bottom:10px;"/>
+    <input id="c-icon" type="text" placeholder="الأيقونة (مثال: 🎮)" class="inp" style="margin-bottom:10px;text-align:center;font-size:20px;"/>
+    <div style="font-size:12px;color:#aaa;margin-bottom:8px;text-align:right;">لون الخلفية:</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+      <div onclick="selectColor('#003087,#0070cc')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#003087,#0070cc);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#107c10,#52b043')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#107c10,#52b043);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#1b2838,#2a475e')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#1b2838,#2a475e);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#e4000f,#ff6b6b')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#e4000f,#ff6b6b);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#ff6600,#ff9900')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#ff6600,#ff9900);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#5865F2,#7289da')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#5865F2,#7289da);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#0099aa,#00c8c8')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#0099aa,#00c8c8);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+      <div onclick="selectColor('#6a1b9a,#9c27b0')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#6a1b9a,#9c27b0);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+    </div>
+    <button class="btn btn-primary" onclick="saveCompany()">حفظ الشركة ✅</button>
+  </div>
+
+  <!-- إضافة منتج -->
+  <div id="panel-product" style="display:none;">
+    <div id="popup-title" style="font-size:14px;font-weight:900;color:#1a1a2e;margin-bottom:12px;text-align:right;">إضافة منتج جديد</div>
+    <div style="font-size:12px;color:#555;font-weight:700;margin-bottom:6px;text-align:right;">اختر الشركة:</div>
+    <select id="p-brand" class="inp" style="margin-bottom:10px;cursor:pointer;"></select>
+    <input id="p-name" type="text" placeholder="اسم المنتج (مثال: Network 10$)" class="inp" style="margin-bottom:10px;"/>
+    <input id="p-price" type="number" placeholder="السعر بالدينار العراقي" class="inp" style="margin-bottom:10px;direction:ltr;"/>
+    <div style="font-size:12px;color:#555;font-weight:700;margin-bottom:6px;text-align:right;">الخصم (اختياري):</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+      <input id="p-discount" type="number" placeholder="0" min="0" max="90" class="inp" style="width:80px;direction:ltr;text-align:center;flex-shrink:0;" oninput="updateDiscountPreview()"/>
+      <div style="font-size:13px;color:#555;">%</div>
+      <div id="discount-preview" style="flex:1;background:#fff8e1;border-radius:10px;padding:8px;text-align:center;font-size:12px;color:#f57f17;font-weight:700;display:none;"></div>
+    </div>
+    <button class="btn btn-primary" onclick="saveProduct()">حفظ المنتج ✅</button>
+  </div>
+</div>
+
+<!-- ===== ADD BRAND POPUP ===== -->
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+</div><!-- end app -->
+
+<script>
+// ===== Navigation =====
+let cur = 'login';
+function goTo(id) {
+  const curEl = document.getElementById(cur);
+  const newEl = document.getElementById(id);
+  if(!curEl || !newEl) return;
+  curEl.classList.remove('active');
+  newEl.classList.add('active');
+  cur = id;
+  if(id === 'dashboard') waitForDB(loadDashboard);
+  if(id === 'orders') waitForDB(() => loadOrders('all'));
+  if(id === 'products_mgr') waitForDB(() => loadProducts('all'));
 }
 
-class AdminApp extends StatelessWidget {
-  const AdminApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'NexCard Admin',
-      debugShowCheckedModeBanner: false,
-      home: AdminHome(),
-    );
-  }
-}
-
-class AdminHome extends StatefulWidget {
-  const AdminHome({super.key});
-  @override
-  State<AdminHome> createState() => _AdminHomeState();
-}
-
-class _AdminHomeState extends State<AdminHome> {
-  late final WebViewController ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    ctrl = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFF060608))
-      ..enableZoom(false)
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (request) {
-          return NavigationDecision.navigate;
-        },
-      ))
-      ..loadFlutterAsset('assets/admin.html');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF060608),
-      body: WebViewWidget(controller: ctrl),
-    );
-  }
-}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1'
