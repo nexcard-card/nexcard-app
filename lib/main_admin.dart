@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
@@ -32,19 +33,17 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
-  late final WebViewController ctrl;
+  late final WebViewController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    ctrl = WebViewController()
+    _ctrl = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFF060608))
       ..enableZoom(false)
       ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (request) {
-          return NavigationDecision.navigate;
-        },
+        onNavigationRequest: (_) => NavigationDecision.navigate,
       ))
       ..loadFlutterAsset('assets/admin.html');
   }
@@ -53,7 +52,22 @@ class _AdminHomeState extends State<AdminHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF060608),
-      body: WebViewWidget(controller: ctrl),
+      body: SafeArea(
+        child: WebViewWidget(
+          controller: _ctrl,
+          gestureRecognizers: {
+            Factory<VerticalDragGestureRecognizer>(
+              () => VerticalDragGestureRecognizer(),
+            ),
+            Factory<TapGestureRecognizer>(
+              () => TapGestureRecognizer(),
+            ),
+            Factory<LongPressGestureRecognizer>(
+              () => LongPressGestureRecognizer(),
+            ),
+          },
+        ),
+      ),
     );
   }
 }
