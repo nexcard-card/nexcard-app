@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+  ));
   runApp(const App());
 }
 
@@ -27,23 +33,40 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late final WebViewController ctrl;
+  late final WebViewController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    ctrl = WebViewController()
+    _ctrl = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFFF0F0F5))
+      ..setBackgroundColor(const Color(0xFFF5F5F5))
+      ..enableZoom(false)
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (_) => NavigationDecision.navigate,
+      ))
       ..loadFlutterAsset('assets/index.html');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F0F5),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: WebViewWidget(controller: ctrl),
+        child: WebViewWidget(
+          controller: _ctrl,
+          gestureRecognizers: {
+            Factory<VerticalDragGestureRecognizer>(
+              () => VerticalDragGestureRecognizer(),
+            ),
+            Factory<TapGestureRecognizer>(
+              () => TapGestureRecognizer(),
+            ),
+            Factory<LongPressGestureRecognizer>(
+              () => LongPressGestureRecognizer(),
+            ),
+          },
+        ),
       ),
     );
   }
