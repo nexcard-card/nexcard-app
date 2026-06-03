@@ -4,257 +4,495 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NexCard Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body { width:100%; height:100%; overflow:hidden; font-family:"Tajawal",sans-serif; background:#111; }
-.app { width:100%; height:100%; position:relative; overflow:hidden; background:#f0f2f5; }
-.screen { position:absolute; top:0; left:0; right:0; bottom:0; display:none; flex-direction:column; overflow:hidden; background:#f0f2f5; }
-.screen.active { display:flex; z-index:10; }
-.scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-.scroll::-webkit-scrollbar { display:none; }
-
-/* Login */
-.login-bg { background:linear-gradient(160deg,#060608,#0d1a35); }
-
-/* Top bar */
-.tbar { padding:38px 16px 12px; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
-.tbar-title { font-size:17px; font-weight:900; color:#1a1a2e; }
-.back-btn { width:36px; height:36px; background:#f0f2f5; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
-/* Cards */
-.stat-card { border-radius:16px; padding:16px; flex:1; }
-.order-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:0 1px 6px rgba(0,0,0,0.06); }
-
-/* Badge */
-.badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:900; }
-.badge-pending { background:#fff8e1; color:#f57f17; }
-.badge-done { background:#e8f5e9; color:#2e7d32; }
-.badge-review { background:#e3f2fd; color:#1565c0; }
-
-/* Buttons */
-.btn { padding:12px 20px; border:none; border-radius:12px; font-size:14px; font-weight:900; font-family:"Tajawal",sans-serif; cursor:pointer; }
-.btn-primary { background:#0099aa; color:#fff; width:100%; padding:14px; border-radius:13px; }
-.btn-success { background:#2e7d32; color:#fff; }
-.btn-danger { background:#e53935; color:#fff; }
-.btn-outline { background:#fff; border:1.5px solid #0099aa; color:#0099aa; }
-
-/* Input */
-.inp { width:100%; padding:12px 14px; background:#fff; border-radius:12px; border:1.5px solid #e8e8e8; font-size:14px; font-family:"Tajawal",sans-serif; color:#1a1a2e; text-align:right; outline:none; }
-.inp:focus { border-color:#0099aa; }
-
-/* Nav */
-.nav { background:#fff; border-top:1px solid #eee; display:flex; align-items:center; justify-content:space-around; padding:8px 0 16px; flex-shrink:0; }
-.nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 12px; cursor:pointer; }
-.nav-lbl { font-size:10px; color:#aaa; font-weight:700; }
-.nav-lbl.on { color:#0099aa; }
-
-/* Toast */
-.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#1a1a2e; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; z-index:999; opacity:0; transition:opacity 0.3s; white-space:nowrap; pointer-events:none; }
-
-@keyframes spin { to{transform:rotate(360deg);} }
-@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-@keyframes slideUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
-</style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:"Tajawal",sans-serif;}
+.app{width:100%;height:100%;position:relative;overflow:hidden;}
+.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;overflow:hidden;background:#f0f2f5;}
+.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{display:none;}
+.tbar{padding:38px 16px 12px;display:flex;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.nav{background:#fff;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-around;padding:8px 0 16px;flex-shrink:0;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;}
+.nl{font-size:10px;color:#aaa;font-weight:700;}
+.nl.on{color:#0099aa;}
+.inp{width:100%;padding:12px 14px;background:#fff;border-radius:12px;border:1.5px solid #e8e8e8;font-size:14px;font-family:"Tajawal",sans-serif;color:#1a1a2e;text-align:right;outline:none;}
+.inp:focus{border-color:#0099aa;}
+.btn{width:100%;padding:14px;background:#0099aa;border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:900;font-family:"Tajawal",sans-serif;cursor:pointer;}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,0.06);}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+</style>
 </head>
 <body>
 <div class="app">
 
-<!-- ===== LOGIN ===== -->
-<div class="screen active login-bg" id="login">
+<!-- LOGIN -->
+<div class="screen active" id="s-login" style="background:linear-gradient(160deg,#060608,#0d1a35);">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;">
     <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0099aa,#00c8c8);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 30px rgba(0,153,170,0.4);">
-      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
     </div>
-    <div style="font-family:Orbitron,monospace;font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:6px;">NEXCARD</div>
+    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:6px;">NEXCARD</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:40px;">لوحة الإدارة</div>
-    <div style="width:100%;margin-bottom:14px;">
-      <input id="admin-pass" type="password" placeholder="كلمة المرور" class="inp" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff;text-align:center;font-size:16px;letter-spacing:4px;" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
-      <div id="login-error" style="color:#ff6b6b;font-size:12px;text-align:center;margin-top:8px;display:none;">كلمة المرور غير صحيحة</div>
-    </div>
-    <button style="width:100%;padding:15px;background:#0099aa;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;-webkit-appearance:none;" onclick="doAdminLogin()">دخول ←</button>
+    <input id="inp-pass" type="password" placeholder="كلمة المرور" style="width:100%;padding:14px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:13px;color:#fff;font-size:16px;text-align:center;letter-spacing:4px;outline:none;font-family:Tajawal,sans-serif;margin-bottom:14px;" onkeydown="if(event.key==='Enter')login()"/>
+    <div id="err" style="color:#ff6b6b;font-size:12px;text-align:center;margin-bottom:10px;display:none;">كلمة المرور غير صحيحة</div>
+    <button onclick="login()" style="width:100%;padding:15px;background:#0099aa;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">دخول ←</button>
   </div>
 </div>
 
-<!-- ===== DASHBOARD ===== -->
-<div class="screen" id="dashboard">
+<!-- DASHBOARD -->
+<div class="screen" id="s-dash">
   <div class="tbar">
-    <div style="width:36px;"></div>
-    <div class="tbar-title">📊 لوحة التحكم</div>
     <div onclick="doLogout()" style="font-size:12px;color:#e53935;font-weight:700;cursor:pointer;">خروج</div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;">📊 لوحة التحكم</div>
+    <div style="width:40px;"></div>
   </div>
   <div class="scroll" style="padding:14px 16px 80px;">
-
-    <!-- إحصائيات -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-      <div class="stat-card" style="background:linear-gradient(135deg,#0099aa,#00c8c8);">
-        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">الطلبات الجديدة</div>
-        <div id="stat-new" style="font-size:28px;font-weight:900;color:#fff;">0</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.7);">قيد الانتظار</div>
+      <div style="background:linear-gradient(135deg,#0099aa,#00c8c8);border-radius:16px;padding:16px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">قيد الانتظار</div>
+        <div id="d-pending" style="font-size:28px;font-weight:900;color:#fff;">0</div>
       </div>
-      <div class="stat-card" style="background:linear-gradient(135deg,#2e7d32,#4caf50);">
+      <div style="background:linear-gradient(135deg,#2e7d32,#4caf50);border-radius:16px;padding:16px;">
         <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">مكتملة اليوم</div>
-        <div id="stat-done" style="font-size:28px;font-weight:900;color:#fff;">0</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.7);">طلب</div>
+        <div id="d-done" style="font-size:28px;font-weight:900;color:#fff;">0</div>
       </div>
-      <div class="stat-card" style="background:linear-gradient(135deg,#1565c0,#1976d2);">
+      <div style="background:linear-gradient(135deg,#1565c0,#1976d2);border-radius:16px;padding:16px;">
         <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">إجمالي المبيعات</div>
-        <div id="stat-total" style="font-size:20px;font-weight:900;color:#fff;">0</div>
+        <div id="d-sales" style="font-size:18px;font-weight:900;color:#fff;">0</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.7);">د.ع</div>
       </div>
-      <div class="stat-card" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);">
+      <div style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);border-radius:16px;padding:16px;">
         <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px;">كل الطلبات</div>
-        <div id="stat-all" style="font-size:28px;font-weight:900;color:#fff;">0</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.7);">طلب</div>
+        <div id="d-all" style="font-size:28px;font-weight:900;color:#fff;">0</div>
       </div>
     </div>
-
-    <!-- أحدث الطلبات -->
     <div style="font-size:15px;font-weight:900;color:#1a1a2e;margin-bottom:10px;text-align:right;">📦 أحدث الطلبات</div>
-    <div id="recent-orders">
-      <div style="text-align:center;padding:30px;color:#aaa;">
-        <div style="width:30px;height:30px;border:3px solid #0099aa;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;"></div>
-        جاري التحميل...
-      </div>
-    </div>
+    <div id="d-orders"><div style="text-align:center;padding:30px;color:#aaa;">جاري التحميل...</div></div>
   </div>
   <div class="nav">
-    <div class="nav-btn" onclick="goTo('products_mgr')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">المنتجات</div></div>
-    <div class="nav-btn" onclick="goTo('orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nav-lbl">الطلبات</div></div>
-    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl on">الرئيسية</div></div>
+    <div class="nb" onclick="show('s-products')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nl">المنتجات</div></div>
+    <div class="nb" onclick="show('s-orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nl">الطلبات</div></div>
+    <div class="nb"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nl on">الرئيسية</div></div>
   </div>
 </div>
 
-<!-- ===== ORDERS ===== -->
-<div class="screen" id="orders">
+<!-- ORDERS -->
+<div class="screen" id="s-orders">
   <div class="tbar">
-    <div style="width:36px;"></div>
-    <div class="tbar-title">📦 الطلبات</div>
-    <div style="width:36px;"></div>
+    <div style="width:40px;"></div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;">📦 الطلبات</div>
+    <div style="width:40px;"></div>
   </div>
-  <!-- فلاتر -->
   <div style="display:flex;gap:8px;padding:10px 16px;flex-shrink:0;overflow-x:auto;">
-    <button id="filter-all" onclick="filterOrders('all')" style="padding:7px 16px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:12px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
-    <button id="filter-pending" onclick="filterOrders('قيد الانتظار')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #f57f17;background:#fff;color:#f57f17;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">⏳ قيد الانتظار</button>
-    <button id="filter-done" onclick="filterOrders('مكتمل')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #2e7d32;background:#fff;color:#2e7d32;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">✅ مكتمل</button>
+    <button onclick="setFilter('all')" id="f-all" style="padding:7px 16px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:12px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
+    <button onclick="setFilter('قيد الانتظار')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #f57f17;background:#fff;color:#f57f17;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">⏳ انتظار</button>
+    <button onclick="setFilter('جاري التنفيذ')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #1565c0;background:#fff;color:#1565c0;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">🔄 تنفيذ</button>
+    <button onclick="setFilter('مكتمل')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #2e7d32;background:#fff;color:#2e7d32;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">✅ مكتمل</button>
+    <button onclick="setFilter('ملغي')" style="padding:7px 16px;border-radius:20px;border:1.5px solid #e53935;background:#fff;color:#e53935;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">❌ ملغي</button>
   </div>
   <div id="orders-list" class="scroll" style="padding:0 16px 80px;"></div>
   <div class="nav">
-    <div class="nav-btn" onclick="goTo('products_mgr')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nav-lbl">المنتجات</div></div>
-    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" stroke="#fff" fill="none"/></svg><div class="nav-lbl on">الطلبات</div></div>
-    <div class="nav-btn" onclick="goTo('dashboard')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl">الرئيسية</div></div>
+    <div class="nb" onclick="show('s-products')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="nl">المنتجات</div></div>
+    <div class="nb"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8" stroke="#fff" fill="none"/></svg><div class="nl on">الطلبات</div></div>
+    <div class="nb" onclick="show('s-dash')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nl">الرئيسية</div></div>
   </div>
 </div>
 
-<!-- ===== ORDER DETAIL ===== -->
-<div class="screen" id="order_detail">
+<!-- ORDER DETAIL -->
+<div class="screen" id="s-order-detail">
   <div class="tbar">
-    <div class="back-btn" onclick="goTo('orders')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
-    <div class="tbar-title">تفاصيل الطلب</div>
+    <div onclick="show('s-orders')" style="width:36px;height:36px;background:#f0f2f5;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;">تفاصيل الطلب</div>
     <div style="width:36px;"></div>
   </div>
-  <div class="scroll" style="padding:14px 16px 100px;">
-    <div id="order-detail-content"></div>
-  </div>
-
+  <div id="order-detail" class="scroll" style="padding:14px 16px 20px;"></div>
 </div>
 
-<!-- ===== PRODUCTS MANAGER ===== -->
-<div class="screen" id="products_mgr">
+<!-- PRODUCTS -->
+<div class="screen" id="s-products">
   <div class="tbar">
+    <div onclick="showAddPopup()" style="width:36px;height:36px;background:#0099aa;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+    <div style="font-size:17px;font-weight:900;color:#1a1a2e;">🛍️ المنتجات</div>
     <div style="width:36px;"></div>
-    <div class="tbar-title">🛍️ إدارة المنتجات</div>
-    <div onclick="showAddProduct()" style="width:36px;height:36px;background:#0099aa;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </div>
   </div>
-  <!-- الشركات tabs -->
   <div style="display:flex;gap:6px;padding:10px 16px;flex-shrink:0;overflow-x:auto;">
-    <button onclick="filterProducts('all')" id="pb-all" style="padding:6px 14px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:11px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
-    <button onclick="filterProducts('PlayStation')" id="pb-ps" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">PlayStation</button>
-    <button onclick="filterProducts('Xbox')" id="pb-xb" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Xbox</button>
-    <button onclick="filterProducts('Steam')" id="pb-st" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Steam</button>
-    <button onclick="filterProducts('Nintendo')" id="pb-ni" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Nintendo</button>
+    <button onclick="filterProd('all')" style="padding:6px 14px;border-radius:20px;border:none;background:#0099aa;color:#fff;font-size:11px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">الكل</button>
+    <button onclick="filterProd('PlayStation')" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">PlayStation</button>
+    <button onclick="filterProd('Xbox')" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Xbox</button>
+    <button onclick="filterProd('Steam')" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Steam</button>
+    <button onclick="filterProd('Nintendo')" style="padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:11px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;white-space:nowrap;">Nintendo</button>
   </div>
-  <div id="products-list" class="scroll" style="padding:0 16px 80px;"></div>
+  <div id="prod-list" class="scroll" style="padding:0 16px 80px;"></div>
   <div class="nav">
-    <div class="nav-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21" stroke="#0099aa"/><line x1="12" y1="17" x2="12" y2="21" stroke="#0099aa"/></svg><div class="nav-lbl on">المنتجات</div></div>
-    <div class="nav-btn" onclick="goTo('orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nav-lbl">الطلبات</div></div>
-    <div class="nav-btn" onclick="goTo('dashboard')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nav-lbl">الرئيسية</div></div>
+    <div class="nb"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0099aa" stroke="#0099aa" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="nl on">المنتجات</div></div>
+    <div class="nb" onclick="show('s-orders')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="nl">الطلبات</div></div>
+    <div class="nb" onclick="show('s-dash')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="nl">الرئيسية</div></div>
   </div>
 </div>
 
-<!-- ===== ADD/EDIT POPUP ===== -->
-<div id="product-popup-ov" onclick="hideProductPopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;"></div>
-<div id="product-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;z-index:201;max-width:430px;margin:0 auto;animation:slideUp 0.3s ease;">
-  <div style="width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px;"></div>
-
-  <!-- tabs: شركة / منتج -->
-  <div id="popup-tabs" style="display:flex;gap:8px;margin-bottom:16px;">
-    <div id="tab-company" onclick="switchPopupTab('company')" style="flex:1;padding:10px;background:#0099aa;color:#fff;border-radius:12px;text-align:center;font-size:13px;font-weight:900;cursor:pointer;">🏢 إضافة شركة</div>
-    <div id="tab-product" onclick="switchPopupTab('product')" style="flex:1;padding:10px;background:#f0f0f0;color:#aaa;border-radius:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;">🎮 إضافة منتج</div>
+<!-- ADD/EDIT POPUP -->
+<div id="pop-ov" onclick="hidePopup()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;"></div>
+<div id="pop" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;z-index:101;animation:slideUp 0.3s ease;">
+  <div style="width:40px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 16px;"></div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <div id="tab-co" onclick="switchTab('co')" style="flex:1;padding:10px;background:#0099aa;color:#fff;border-radius:12px;text-align:center;font-size:13px;font-weight:900;cursor:pointer;">🏢 شركة</div>
+    <div id="tab-pr" onclick="switchTab('pr')" style="flex:1;padding:10px;background:#f0f0f0;color:#aaa;border-radius:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;">🎮 منتج</div>
   </div>
-
-  <!-- إضافة شركة -->
-  <div id="panel-company">
-    <input id="c-name" type="text" placeholder="اسم الشركة (مثال: PlayStation)" class="inp" style="margin-bottom:10px;"/>
-    <input id="c-icon" type="text" placeholder="الأيقونة (مثال: 🎮)" class="inp" style="margin-bottom:10px;text-align:center;font-size:20px;"/>
-    <div style="font-size:12px;color:#aaa;margin-bottom:8px;text-align:right;">لون الخلفية:</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
-      <div onclick="selectColor('#003087,#0070cc')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#003087,#0070cc);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#107c10,#52b043')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#107c10,#52b043);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#1b2838,#2a475e')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#1b2838,#2a475e);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#e4000f,#ff6b6b')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#e4000f,#ff6b6b);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#ff6600,#ff9900')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#ff6600,#ff9900);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#5865F2,#7289da')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#5865F2,#7289da);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#0099aa,#00c8c8')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#0099aa,#00c8c8);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
-      <div onclick="selectColor('#6a1b9a,#9c27b0')" style="height:36px;border-radius:8px;background:linear-gradient(135deg,#6a1b9a,#9c27b0);cursor:pointer;border:2px solid transparent;" class="color-opt"></div>
+  <div id="panel-co">
+    <input id="c-name" type="text" placeholder="اسم الشركة" class="inp" style="margin-bottom:10px;"/>
+    <input id="c-icon" type="text" placeholder="الأيقونة 🎮" class="inp" style="margin-bottom:10px;text-align:center;font-size:20px;"/>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;" id="colors">
+      <div onclick="selColor(this,'#003087,#0070cc')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#003087,#0070cc);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#107c10,#52b043')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#107c10,#52b043);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#1b2838,#2a475e')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#1b2838,#2a475e);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#e4000f,#ff6b6b')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#e4000f,#ff6b6b);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#ff6600,#ff9900')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#ff6600,#ff9900);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#5865F2,#7289da')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#5865F2,#7289da);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#0099aa,#00c8c8')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#0099aa,#00c8c8);cursor:pointer;border:2px solid transparent;"></div>
+      <div onclick="selColor(this,'#6a1b9a,#9c27b0')" style="height:34px;border-radius:8px;background:linear-gradient(135deg,#6a1b9a,#9c27b0);cursor:pointer;border:2px solid transparent;"></div>
     </div>
-    <button class="btn btn-primary" onclick="saveCompany()">حفظ الشركة ✅</button>
+    <button class="btn" onclick="saveCompany()">حفظ الشركة ✅</button>
   </div>
-
-  <!-- إضافة منتج -->
-  <div id="panel-product" style="display:none;">
-    <div id="popup-title" style="font-size:14px;font-weight:900;color:#1a1a2e;margin-bottom:12px;text-align:right;">إضافة منتج جديد</div>
-    <div style="font-size:12px;color:#555;font-weight:700;margin-bottom:6px;text-align:right;">اختر الشركة:</div>
+  <div id="panel-pr" style="display:none;">
+    <div id="pop-title" style="font-size:14px;font-weight:900;color:#1a1a2e;margin-bottom:12px;text-align:right;">إضافة منتج</div>
     <select id="p-brand" class="inp" style="margin-bottom:10px;cursor:pointer;"></select>
-    <input id="p-name" type="text" placeholder="اسم المنتج (مثال: Network 10$)" class="inp" style="margin-bottom:10px;"/>
-    <input id="p-price" type="number" placeholder="السعر بالدينار العراقي" class="inp" style="margin-bottom:10px;direction:ltr;"/>
-    <div style="font-size:12px;color:#555;font-weight:700;margin-bottom:6px;text-align:right;">الخصم (اختياري):</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
-      <input id="p-discount" type="number" placeholder="0" min="0" max="90" class="inp" style="width:80px;direction:ltr;text-align:center;flex-shrink:0;" oninput="updateDiscountPreview()"/>
-      <div style="font-size:13px;color:#555;">%</div>
-      <div id="discount-preview" style="flex:1;background:#fff8e1;border-radius:10px;padding:8px;text-align:center;font-size:12px;color:#f57f17;font-weight:700;display:none;"></div>
+    <input id="p-name" type="text" placeholder="اسم المنتج" class="inp" style="margin-bottom:10px;"/>
+    <input id="p-price" type="number" placeholder="السعر بالدينار" class="inp" style="margin-bottom:10px;direction:ltr;"/>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
+      <input id="p-disc" type="number" placeholder="0" min="0" max="90" class="inp" style="width:70px;direction:ltr;text-align:center;" oninput="previewDisc()"/>
+      <span style="color:#555;font-size:13px;">% خصم</span>
+      <div id="disc-prev" style="flex:1;background:#fff8e1;border-radius:8px;padding:6px;text-align:center;font-size:11px;color:#f57f17;font-weight:700;display:none;"></div>
     </div>
-    <button class="btn btn-primary" onclick="saveProduct()">حفظ المنتج ✅</button>
+    <button class="btn" onclick="saveProduct()">حفظ المنتج ✅</button>
   </div>
 </div>
-
-<!-- ===== ADD BRAND POPUP ===== -->
 
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
-</div><!-- end app -->
-
+</div>
 <script>
-// ===== Navigation =====
-let cur = 'login';
-function goTo(id) {
-  const curEl = document.getElementById(cur);
-  const newEl = document.getElementById(id);
-  if(!curEl || !newEl) return;
-  curEl.classList.remove('active');
-  newEl.classList.add('active');
-  cur = id;
-  if(id === 'dashboard') waitForDB(loadDashboard);
-  if(id === 'orders') waitForDB(() => loadOrders('all'));
-  if(id === 'products_mgr') waitForDB(() => loadProducts('all'));
+// ===== state =====
+const PASS = '1234';
+let db = null;
+let orders = [];
+let products = [];
+let companies = [];
+let editProdId = null;
+let selectedBrandColor = '#003087,#0070cc';
+let curFilter = 'all';
+let curScreen = 's-login';
+
+// ===== init =====
+document.addEventListener('DOMContentLoaded', () => {
+  firebase.initializeApp({
+    apiKey:"AIzaSyCRQlZ3w0TQ6xbLhp1Gl_8o2DJvjsoQf-E",
+    databaseURL:"https://nexcard-2b2cb-default-rtdb.firebaseio.com",
+    projectId:"nexcard-2b2cb",
+    appId:"1:1017132001372:web:8aec390fdf63ce98671e99"
+  });
+  db = firebase.database();
+});
+
+// ===== navigation =====
+function show(id) {
+  document.getElementById(curScreen).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  curScreen = id;
+  if(id === 's-dash') loadDash();
+  if(id === 's-orders') loadOrders();
+  if(id === 's-products') loadProducts();
 }
 
+// ===== login =====
+function login() {
+  const p = document.getElementById('inp-pass').value.trim();
+  if(p === PASS) {
+    document.getElementById('err').style.display = 'none';
+    show('s-dash');
+  } else {
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('inp-pass').value = '';
+  }
+}
+
+function doLogout() {
+  show('s-login');
+  document.getElementById('inp-pass').value = '';
+}
+
+// ===== toast =====
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.opacity = '1'
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2500);
+}
+
+// ===== dashboard =====
+function loadDash() {
+  if(!db) return;
+  db.ref('orders').on('value', snap => {
+    orders = [];
+    snap.forEach(c => orders.unshift({id:c.key,...c.val()}));
+    const today = new Date().toLocaleDateString('ar-IQ');
+    document.getElementById('d-pending').textContent = orders.filter(o=>o.status==='قيد الانتظار').length;
+    document.getElementById('d-done').textContent = orders.filter(o=>o.status==='مكتمل'&&new Date(o.timestamp).toLocaleDateString('ar-IQ')===today).length;
+    document.getElementById('d-sales').textContent = orders.filter(o=>o.status==='مكتمل').reduce((s,o)=>s+Number(o.price||0),0).toLocaleString();
+    document.getElementById('d-all').textContent = orders.length;
+    const el = document.getElementById('d-orders');
+    el.innerHTML = orders.slice(0,5).map(o=>orderHTML(o)).join('') || '<div style="text-align:center;padding:20px;color:#aaa;">لا توجد طلبات</div>';
+  });
+}
+
+// ===== orders =====
+function loadOrders() {
+  if(!db) return;
+  db.ref('orders').on('value', snap => {
+    orders = [];
+    snap.forEach(c => orders.unshift({id:c.key,...c.val()}));
+    renderOrders();
+  });
+}
+
+function setFilter(f) { curFilter = f; renderOrders(); }
+
+function renderOrders() {
+  const el = document.getElementById('orders-list');
+  if(!el) return;
+  const list = curFilter==='all' ? orders : orders.filter(o=>o.status===curFilter);
+  el.innerHTML = list.map(o=>orderHTML(o)).join('') || '<div style="text-align:center;padding:40px;color:#aaa;">لا توجد طلبات</div>';
+}
+
+function orderHTML(o) {
+  const d = new Date(o.timestamp);
+  const sc = {
+    'قيد الانتظار':['#fff8e1','#f57f17','⏳'],
+    'جاري التنفيذ':['#e3f2fd','#1565c0','🔄'],
+    'مكتمل':['#e8f5e9','#2e7d32','✅'],
+    'ملغي':['#ffebee','#e53935','❌']
+  }[o.status] || ['#f5f5f5','#555','📦'];
+  return `<div class="card" onclick="openOrder('${o.id}')">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:11px;background:${sc[0]};color:${sc[1]};padding:3px 10px;border-radius:20px;font-weight:900;">${sc[2]} ${o.status}</span>
+      <div style="text-align:right;"><div style="font-size:13px;font-weight:900;color:#1a1a2e;">${o.orderId||''}</div><div style="font-size:10px;color:#aaa;">${d.toLocaleDateString('ar-IQ')} ${d.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'})}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <div style="font-size:13px;font-weight:900;color:#0099aa;">${Number(o.price||0).toLocaleString()} د.ع</div>
+      <div style="text-align:right;font-size:12px;color:#555;">${o.product||''}<br><span style="color:#aaa;font-size:11px;">👤 ${o.name||''} 📱 ${o.phone||''}</span></div>
+    </div>
+  </div>`;
+}
+
+function openOrder(id) {
+  const o = orders.find(x=>x.id===id);
+  if(!o) return;
+  const d = new Date(o.timestamp);
+  const el = document.getElementById('order-detail');
+  el.innerHTML = `
+    <div class="card">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:12px;text-align:right;">📋 تفاصيل الطلب</div>
+      ${row('رقم الطلب', o.orderId)}
+      ${row('التاريخ', d.toLocaleDateString('ar-IQ')+' '+d.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'}))}
+      ${row('المنتج', o.product||'—')}
+      ${row('المبلغ', Number(o.price||0).toLocaleString()+' د.ع')}
+      ${row('طريقة الدفع', o.payMethod||'—')}
+      ${row('الحالة', o.status)}
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:900;color:#1a1a2e;margin-bottom:12px;text-align:right;">👤 بيانات العميل</div>
+      ${row('الاسم', o.name||'—')}
+      ${row('الهاتف', o.phone||'—')}
+      ${row('ملاحظات', o.notes||'—')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <button onclick="changeStatus('${id}','مكتمل')" style="padding:12px;background:#2e7d32;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">✅ مكتمل</button>
+      <button onclick="changeStatus('${id}','جاري التنفيذ')" style="padding:12px;background:#1565c0;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">🔄 تنفيذ</button>
+      <button onclick="changeStatus('${id}','قيد الانتظار')" style="padding:12px;background:#f57f17;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">⏳ انتظار</button>
+      <button onclick="changeStatus('${id}','ملغي')" style="padding:12px;background:#e53935;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">❌ ملغي</button>
+    </div>
+    <button onclick="delOrder('${id}')" style="width:100%;padding:12px;background:#ffebee;border:1.5px solid #e53935;border-radius:12px;color:#e53935;font-size:13px;font-weight:900;font-family:Tajawal,sans-serif;cursor:pointer;">🗑️ حذف الطلب</button>`;
+  show('s-order-detail');
+}
+
+function row(k, v) {
+  return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:12px;color:#aaa;">${k}</span><span style="font-size:12px;font-weight:700;color:#1a1a2e;">${v}</span></div>`;
+}
+
+async function changeStatus(id, s) {
+  await db.ref('orders/'+id).update({status:s});
+  orders = orders.map(o=>o.id===id?{...o,status:s}:o);
+  toast('✅ تم تغيير الحالة');
+  openOrder(id);
+}
+
+async function delOrder(id) {
+  if(!confirm('حذف الطلب؟')) return;
+  await db.ref('orders/'+id).remove();
+  toast('✅ تم الحذف');
+  show('s-orders');
+}
+
+// ===== products =====
+const DEF_BRANDS = [
+  {name:'PlayStation',icon:'🎮',color:'#003087,#0070cc'},
+  {name:'Xbox',icon:'🟢',color:'#107c10,#52b043'},
+  {name:'Steam',icon:'🔵',color:'#1b2838,#2a475e'},
+  {name:'Nintendo',icon:'🎲',color:'#e4000f,#ff6b6b'},
+  {name:'Free Fire',icon:'🎯',color:'#ff6600,#ff9900'},
+  {name:'Fortnite',icon:'⚡',color:'#5865F2,#7289da'},
+];
+const DEF_PRODUCTS = [
+  {brand:'PlayStation',name:'Network 10$',price:13000,discount:0},
+  {brand:'PlayStation',name:'Network 20$',price:25000,discount:0},
+  {brand:'Xbox',name:'Game Pass شهر',price:17000,discount:15},
+  {brand:'Steam',name:'Wallet 10$',price:13500,discount:0},
+  {brand:'Steam',name:'Wallet 20$',price:26000,discount:10},
+  {brand:'Nintendo',name:'eShop 10$',price:13000,discount:0},
+  {brand:'Free Fire',name:'100 جوهرة',price:5000,discount:0},
+  {brand:'Fortnite',name:'1000 V-Bucks',price:9000,discount:0},
+];
+
+let prodFilter = 'all';
+
+function loadProducts() {
+  if(!db) return;
+  db.ref('companies').once('value', s => { if(!s.exists()) DEF_BRANDS.forEach(c=>db.ref('companies').push(c)); });
+  db.ref('products').once('value', s => { if(!s.exists()) DEF_PRODUCTS.forEach(p=>db.ref('products').push({...p,active:true,icon:DEF_BRANDS.find(b=>b.name===p.brand)?.icon||'🎮',color:DEF_BRANDS.find(b=>b.name===p.brand)?.color||'#0099aa,#00c8c8'})); });
+  db.ref('companies').on('value', s => { companies=[]; s.forEach(c=>companies.push({id:c.key,...c.val()})); });
+  db.ref('products').on('value', s => { products=[]; s.forEach(c=>products.push({id:c.key,...c.val()})); renderProducts(); });
+}
+
+function filterProd(f) { prodFilter=f; renderProducts(); }
+
+function renderProducts() {
+  const el = document.getElementById('prod-list');
+  if(!el) return;
+  const list = prodFilter==='all' ? products : products.filter(p=>p.brand===prodFilter);
+  if(!list.length) { el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;">لا توجد منتجات</div>'; return; }
+  el.innerHTML = list.map(p => {
+    const final = p.discount>0 ? Math.round(p.price*(1-p.discount/100)) : p.price;
+    return `<div class="card" style="display:flex;align-items:center;gap:10px;">
+      <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,${p.color||'#0099aa,#00c8c8'});display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${p.icon||'🎮'}</div>
+      <div style="flex:1;text-align:right;">
+        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${p.name}</div>
+        <div style="font-size:11px;color:#aaa;">${p.brand}</div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+          <span style="font-size:12px;font-weight:900;color:#0099aa;">${final.toLocaleString()} د.ع</span>
+          ${p.discount>0?`<span style="font-size:10px;color:#aaa;text-decoration:line-through;">${p.price.toLocaleString()}</span><span style="background:#e53935;color:#fff;font-size:9px;font-weight:900;padding:1px 5px;border-radius:8px;">-${p.discount}%</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <button onclick="editProd('${p.id}')" style="width:30px;height:30px;background:#e3f2fd;border:none;border-radius:8px;font-size:13px;cursor:pointer;">✏️</button>
+        <button onclick="toggleProd('${p.id}',${!p.active})" style="width:30px;height:30px;background:${p.active?'#fff8e1':'#e8f5e9'};border:none;border-radius:8px;font-size:13px;cursor:pointer;">${p.active?'⏸':'▶'}</button>
+        <button onclick="delProd('${p.id}')" style="width:30px;height:30px;background:#ffebee;border:none;border-radius:8px;font-size:13px;cursor:pointer;">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== popup =====
+function showAddPopup() {
+  editProdId = null;
+  document.getElementById('c-name').value='';
+  document.getElementById('c-icon').value='';
+  document.getElementById('p-name').value='';
+  document.getElementById('p-price').value='';
+  document.getElementById('p-disc').value='';
+  document.getElementById('disc-prev').style.display='none';
+  document.getElementById('pop-title').textContent='إضافة منتج';
+  fillBrands();
+  switchTab('co');
+  document.getElementById('pop-ov').style.display='block';
+  document.getElementById('pop').style.display='block';
+}
+
+function hidePopup() {
+  document.getElementById('pop-ov').style.display='none';
+  document.getElementById('pop').style.display='none';
+  editProdId=null;
+}
+
+function switchTab(t) {
+  const isCo = t==='co';
+  document.getElementById('panel-co').style.display = isCo?'block':'none';
+  document.getElementById('panel-pr').style.display = isCo?'none':'block';
+  document.getElementById('tab-co').style.background = isCo?'#0099aa':'#f0f0f0';
+  document.getElementById('tab-co').style.color = isCo?'#fff':'#aaa';
+  document.getElementById('tab-pr').style.background = isCo?'#f0f0f0':'#0099aa';
+  document.getElementById('tab-pr').style.color = isCo?'#aaa':'#fff';
+  if(!isCo) fillBrands();
+}
+
+function fillBrands() {
+  const sel = document.getElementById('p-brand');
+  const list = companies.length>0 ? companies : DEF_BRANDS;
+  sel.innerHTML = list.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
+}
+
+function selColor(el, c) {
+  selectedBrandColor = c;
+  document.querySelectorAll('#colors div').forEach(d=>{d.style.border='2px solid transparent';d.style.transform='scale(1)';});
+  el.style.border='2px solid #0099aa';
+  el.style.transform='scale(1.1)';
+}
+
+function previewDisc() {
+  const price = parseInt(document.getElementById('p-price').value)||0;
+  const disc = parseInt(document.getElementById('p-disc').value)||0;
+  const el = document.getElementById('disc-prev');
+  if(price>0&&disc>0) { el.style.display='block'; el.textContent=`بعد الخصم: ${Math.round(price*(1-disc/100)).toLocaleString()} د.ع`; }
+  else el.style.display='none';
+}
+
+async function saveCompany() {
+  const name = document.getElementById('c-name').value.trim();
+  const icon = document.getElementById('c-icon').value.trim();
+  if(!name||!icon) { toast('⚠️ أكمل البيانات'); return; }
+  await db.ref('companies').push({name,icon,color:selectedBrandColor});
+  toast('✅ تم إضافة الشركة!');
+  document.getElementById('c-name').value='';
+  document.getElementById('c-icon').value='';
+  fillBrands();
+}
+
+function editProd(id) {
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  editProdId=id;
+  switchTab('pr');
+  fillBrands();
+  document.getElementById('pop-title').textContent='تعديل المنتج';
+  document.getElementById('p-brand').value=p.brand;
+  document.getElementById('p-name').value=p.name;
+  document.getElementById('p-price').value=p.price;
+  document.getElementById('p-disc').value=p.discount||0;
+  document.getElementById('pop-ov').style.display='block';
+  document.getElementById('pop').style.display='block';
+}
+
+async function saveProduct() {
+  const brand=document.getElementById('p-brand').value;
+  const name=document.getElementById('p-name').value.trim();
+  const price=parseInt(document.getElementById('p-price').value);
+  const discount=parseInt(document.getElementById('p-disc').value)||0;
+  if(!brand||!name||!price) { toast('⚠️ أكمل البيانات'); return; }
+  const co = [...companies,...DEF_BRANDS].find(c=>c.name===brand);
+  const data = {brand,name,price,discount,icon:co?.icon||'🎮',color:co?.color||'#0099aa,#00c8c8',active:true};
+  if(editProdId) { await db.ref('products/'+editProdId).update(data); toast('✅ تم التعديل!'); }
+  else { await db.ref('products').push(data); toast('✅ تم الإضافة!'); }
+  hidePopup();
+}
+
+async function toggleProd(id,active) { await db.ref('products/'+id).update({active}); toast(active?'✅ تم التفعيل':'⏸ تم التعطيل'); }
+async function delProd(id) { if(!confirm('حذف المنتج؟')) return; await db.ref('products/'+id).remove(); toast('✅ تم الحذف'); }
+</script>
+</body>
+</html>
