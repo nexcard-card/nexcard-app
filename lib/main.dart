@@ -62,9 +62,6 @@ class _HomeState extends State<Home> {
             Factory<TapGestureRecognizer>(
               () => TapGestureRecognizer(),
             ),
-            Factory<LongPressGestureRecognizer>(
-              () => LongPressGestureRecognizer(),
-            ),
           },
         ),
       ),
